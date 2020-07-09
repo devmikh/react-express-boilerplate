@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
 export default function CategoryFilter(props) {
   const { state, setState } = props;
@@ -9,8 +9,8 @@ export default function CategoryFilter(props) {
   let filteredCategories = categories.filter(
     (category, index) => categories.indexOf(category) === index
   );
-  let categoryOptions = filteredCategories.map((category) => {
-    return <option>{category}</option>;
+  let categoryOptions = filteredCategories.map((category, index) => {
+    return <option key={index}>{category}</option>;
   });
 
   useEffect(() => {

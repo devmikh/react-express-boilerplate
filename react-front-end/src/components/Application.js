@@ -8,11 +8,11 @@ export default function Application(props) {
   // Destructing custom hook
   const {
     state,
-    setTab,
     setState,
     setCurrentItem,
     setWarranties,
     setRenderForm,
+    addItem,
   } = useApplicationData();
 
   return (
@@ -36,6 +36,7 @@ export default function Application(props) {
           setCurrentItem={setCurrentItem}
           setWarranties={setWarranties}
           setRenderForm={setRenderForm}
+          addItem={addItem}
         />
       </section>
     </main>
