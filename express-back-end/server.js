@@ -107,10 +107,7 @@ App.get("/api/items/:id", (req, res) => {
       return db.query(paymentQuery, queryParams);
     })
     .then((data) => {
-      console.log(data.rows);
-
       resObj = { ...resObj, payment: data.rows[0] };
-      console.log(data.rows);
       if (data.rows.length !== 0) {
         return db.query(transactionQuery, [data.rows[0].id]);
       }
@@ -118,8 +115,6 @@ App.get("/api/items/:id", (req, res) => {
       //data.rows ? [data.rows[0].id] :
     })
     .then((data) => {
-      console.log("after transactions");
-
       resObj = { ...resObj, transactions: data.rows };
       return db.query(fileQuery, queryParams);
     })
@@ -139,7 +134,6 @@ App.get("/api/items/:id", (req, res) => {
 });
 
 App.post("/api/items", (req, res) => {
-  console.log(req.body);
   let {
     itemName,
     itemCategory,
@@ -175,7 +169,6 @@ App.post("/api/items", (req, res) => {
     [itemName, itemCategory, itemDescription]
   )
     .then((data) => {
-      console.log(typeof data.rows[0].id);
       let dir = `./uploads/1/${data.rows[0].id}`;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
@@ -215,9 +208,10 @@ App.post("/api/items", (req, res) => {
     })
     .catch((error) => console.log(error));
 });
-
+//
+// Update
+//
 App.post("/api/items/:id", (req, res) => {
-  console.log(req.body);
   let {
     itemName,
     itemCategory,
@@ -257,15 +251,90 @@ App.post("/api/items/:id", (req, res) => {
     [itemName, itemCategory, itemDescription, req.params.id]
   )
     .then((data) => {
-      console.log(typeof data.rows[0].id);
       let dir = `./uploads/1/${data.rows[0].id}`;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
 
       if (warrantyStartDate) {
+        // select exists(select 1 from contact where id=12
+        db.query(
+          `SELECT exists(SELECT 1 FROM entries WHERE id=$1 AND type = 'warranty')`,
+          [req.params.id]
+        ).then((data) => {
+          console.log(data.rows[0].exists);
+          if (!data.rows[0].exists) {
+            db.query(
+              `
+          INSERT INTO entries (item_id, type, duration_in_months, start_date, sms, email, days_prior) VALUES ($1, 'warranty', $2, $3, $4, $5, $6);
+          `,
+              [
+                req.params.id,
+                warrantyDuration,
+                new Date(warrantyStartDate).getTime() + 25200001,
+                warrantySmsNotification,
+                warrantyEmailNotification,
+                warrantyNotifyDaysPrior,
+              ]
+            );
+          } else {
+            db.query(
+              `
+              UPDATE entries
+              SET
+              duration_in_months = $1,
+              start_date = $2,
+              sms = $3,
+              email = $4,
+              days_prior = $5
+              WHERE type = 'warranty'
+              AND item_id = $6
+            
+          `,
+              [
+                warrantyDuration,
+                new Date(warrantyStartDate).getTime() + 25200001,
+                warrantySmsNotification,
+                warrantyEmailNotification,
+                warrantyNotifyDaysPrior,
+                req.params.id,
+              ]
+            );
+          }
+        });
+      } else {
         db.query(
           `
+            DELETE FROM entries
+            WHERE item_id = $1
+            AND type = 'warranty'
+          `,
+          [req.params.id]
+        );
+      }
+      if (paymentStartDate) {
+        db.query(
+          `SELECT exists(SELECT 1 FROM entries WHERE id=$1 AND type = 'payment')`,
+          [req.params.id]
+        ).then((data) => {
+          if (!data.rows[0].exists) {
+            console.log("before create payment");
+            db.query(
+              `
+          INSERT INTO entries (item_id, type, duration_in_months, start_date, sms, email, days_prior) VALUES ($1, 'payment', $2, $3, $4, $5, $6);
+          `,
+              [
+                req.params.id,
+                paymentDuration,
+                new Date(paymentStartDate).getTime() + 25200001,
+                paymentSmsNotification,
+                paymentEmailNotification,
+                paymentNotifyDaysPrior,
+              ]
+            );
+          } else {
+            db.query(
+              `
           UPDATE entries
           SET
           duration_in_months = $1,
@@ -273,41 +342,28 @@ App.post("/api/items/:id", (req, res) => {
           sms = $3,
           email = $4,
           days_prior = $5
-          WHERE type = 'warranty'
+          WHERE type = 'payment'
           AND item_id = $6
-        
-      `,
-          [
-            warrantyDuration,
-            new Date(warrantyStartDate).getTime() + 25200001,
-            warrantySmsNotification,
-            warrantyEmailNotification,
-            warrantyNotifyDaysPrior,
-            req.params.id,
-          ]
-        );
-      }
-      if (paymentStartDate) {
+          `,
+              [
+                paymentDuration,
+                new Date(paymentStartDate).getTime() + 25200001,
+                paymentSmsNotification,
+                paymentEmailNotification,
+                paymentNotifyDaysPrior,
+                req.params.id,
+              ]
+            );
+          }
+        });
+      } else {
         db.query(
           `
-      UPDATE entries
-      SET
-      duration_in_months = $1,
-      start_date = $2,
-      sms = $3,
-      email = $4,
-      days_prior = $5
-      WHERE type = 'payment'
-      AND item_id = $6
-      `,
-          [
-            paymentDuration,
-            new Date(paymentStartDate).getTime() + 25200001,
-            paymentSmsNotification,
-            paymentEmailNotification,
-            paymentNotifyDaysPrior,
-            req.params.id,
-          ]
+            DELETE FROM entries
+            WHERE item_id = $1
+            AND type = 'payment'
+          `,
+          [req.params.id]
         );
       }
       res.json(data.rows[0].id);
@@ -324,7 +380,6 @@ App.post("/api/files/:id/delete", (req, res) => {
     RETURNING url;
   `;
   db.query(query, [req.params.id]).then((data) => {
-    // console.log(data.rows[0].url);
     fs.unlinkSync(data.rows[0].url);
     res.json("hello");
   });
@@ -333,21 +388,18 @@ App.post("/api/files/:id/delete", (req, res) => {
 // File download
 
 // App.get("/api/files/:name", (req, res) => {
-//   console.log("downloading");
 //   res.download(`./uploads/${req.params.name}`);
 // });
-// App.get("/api/files", (req, res) => {
-//   db.query(
-//     `
-//           SELECT url From files Where id = 3
-//           `
-//   ).then((data) => {
-//     console.log("downloading");
-//     // console.log(data.rows[0]);
-
-//     res.download(data.rows[0].url);
-//   });
-// });
+App.get("/api/files/:id", (req, res) => {
+  db.query(
+    `
+          SELECT url From files Where id = $1
+          `,
+    [req.params.id]
+  ).then((data) => {
+    res.download(data.rows[0].url);
+  });
+});
 //
 //
 

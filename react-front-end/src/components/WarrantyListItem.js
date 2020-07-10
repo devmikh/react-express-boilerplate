@@ -74,7 +74,7 @@ export default function WarrantyListItem(props) {
         />
       </td>
       <td>
-        <button onClick={(e) => props.setCurrentItem({ id: item_id })}>
+        <button onClick={(e) => props.fetchItemDetails(item_id, false)}>
           <i className="fa fa-info-circle" aria-hidden="true"></i>
         </button>
       </td>

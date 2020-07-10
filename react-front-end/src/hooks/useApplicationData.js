@@ -24,6 +24,23 @@ export default function useApplicationData() {
     setState({ ...state, renderEditForm });
 
   const onFileUpload = (fileObj, itemId) => {
+    // for (let key in files) {
+    //   if (files[key] instanceof File) {
+    //     // Create an object of formData
+    //     const formData = new FormData();
+
+    //     // Update the formData object
+    //     formData.append("file", files[key]);
+
+    //     // Details of the uploaded file
+    //     // console.log("in upload", fileObj);
+
+    //     // Request made to the backend api
+    //     // Send formData object
+    //     return axios.post(`api/uploadfile/${itemId}`, formData);
+    //   }
+    // }
+
     // Create an object of formData
     const formData = new FormData();
 
@@ -35,7 +52,7 @@ export default function useApplicationData() {
 
     // Request made to the backend api
     // Send formData object
-    axios.post(`api/uploadfile/${itemId}`, formData);
+    return axios.post(`api/uploadfile/${itemId}`, formData);
   };
 
   function addItem(inputObj) {
@@ -53,24 +70,35 @@ export default function useApplicationData() {
     });
   }
   function updateItem(inputObj) {
-    console.log(state.currentItem);
+    // console.log(state.currentItem);
 
     return axios
       .post(`/api/items/${state.currentItem.id}`, inputObj)
       .then((response) => {
-        console.log(inputObj.files);
         for (let key in inputObj.files) {
           if (inputObj.files[key] instanceof File) {
-            onFileUpload(inputObj.files[key], response.data);
+            onFileUpload(inputObj.files[key], response.data).then(() => {
+              fetchItemDetails(response.data, false);
+            });
           }
         }
-        //populateState();
+        fetchItemDetails(state.currentItem.id, false);
       });
   }
 
-  const fetchItemDetails = (id) => {
+  // const fetchItemDetails = (id) => {
+  //   return axios.get(`/api/items/${id}`).then((response) => {
+  //     // console.log("inside fetchitemdetails", response.data);
+  //     setCurrentItem(response.data);
+  //   });
+  // };
+
+  const fetchItemDetails = (id, renderEditForm) => {
     return axios.get(`/api/items/${id}`).then((response) => {
-      setCurrentItem(response.data);
+      console.log("inside fetchitemdetails", response.data);
+      // setCurrentItem(response.data);
+
+      setState({ ...state, currentItem: response.data, renderEditForm });
     });
   };
 
@@ -81,13 +109,13 @@ export default function useApplicationData() {
   };
 
   const populateState = () => {
-    console.log("INSIDE populate()");
+    // console.log("INSIDE populate()");
     Promise.all([
       axios.get("/api/users/1"),
       axios.get("/api/warranties"),
       // axios.get("/api/interviewers"),
     ]).then(([response, response2]) => {
-      console.log("INSIDE pop", response2.data);
+      // console.log("INSIDE pop", response2.data);
 
       setState((prev) => ({
         ...prev,
@@ -102,6 +130,10 @@ export default function useApplicationData() {
   useEffect(() => {
     populateState();
   }, [state.currentItem]);
+
+  // useEffect(() => {
+  //   fetchItemDetails();
+  // }, [state.renderEditForm]);
 
   return {
     state,

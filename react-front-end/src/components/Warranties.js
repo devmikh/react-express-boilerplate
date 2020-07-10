@@ -52,6 +52,7 @@ export default function Warranties(props) {
       <WarrantyList
         warranties={state.displayedWarranties}
         setCurrentItem={props.setCurrentItem}
+        fetchItemDetails={props.fetchItemDetails}
       />
       {/* {warrantyItems} */}
       {/* {props.warranties.map((warranty) => (

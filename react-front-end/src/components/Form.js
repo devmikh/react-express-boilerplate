@@ -198,7 +198,18 @@ export default function Form(props) {
       paymentMonthly,
       files,
     }).then(() => {
+      // if (currentItem) {
+      //   props.fetchItemDetails(currentItem.id).then(() => {
+      //     props.setRenderForm(false);
+      //   });
+      // } else {
       props.setRenderForm(false);
+      // }
+
+      // console.log(
+      //   "after set render form in form.js",
+      //   props.state.renderEditForm
+      // );
     });
   }
 

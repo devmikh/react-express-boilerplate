@@ -8,6 +8,7 @@ export default function Warranties(props) {
         key={warranty.id}
         warranty={warranty}
         setCurrentItem={props.setCurrentItem}
+        fetchItemDetails={props.fetchItemDetails}
       />
     );
   });
