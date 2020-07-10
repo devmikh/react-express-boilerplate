@@ -1,34 +1,67 @@
 import React, { useState } from "react";
+import FileList from "./FileList";
 
 export default function Form(props) {
-  const { addItem } = props;
-
+  const { addItem, setCurrentItem, deleteFile } = props;
+  const { currentItem } = props;
+  // const { warranty, payment } = currentItem;
   const [state, setState] = useState({
     // Initialize application state
     // Item section
-    itemName: props.itemName || "",
-    itemCategory: props.itemCategory || "Other",
-    itemDescription: props.itemDescription || "",
+    // currentItem.item.name ||
+    itemName: (currentItem && currentItem.item.name) || "",
+    itemCategory: (currentItem && currentItem.item.category) || "Other",
+    itemDescription: (currentItem && currentItem.item.description) || "",
 
     // Warranty section
-    warrantySectionActive: props.warrantySectionActive || false,
-    warrantyStartDate: props.warrantyStartDate || "",
-    warrantyDuration: props.warrantyDuration || "",
-    warrantySmsNotification: props.warrantySmsNotification || false,
-    warrantyEmailNotification: props.warrantyEmailNotification || false,
-    warrantyNotifyDaysPrior: props.warrantyNotifyDaysPrior || "",
+    warrantySectionActive: (currentItem && currentItem.warranty) || false,
+    warrantyStartDate:
+      (currentItem &&
+        currentItem.warranty &&
+        formatDate(new Date(parseInt(currentItem.warranty.start_date, 10)))) ||
+      "",
+    warrantyDuration:
+      (currentItem &&
+        currentItem.warranty &&
+        currentItem.warranty.duration_in_months) ||
+      "",
+    warrantySmsNotification:
+      (currentItem && currentItem.warranty && currentItem.warranty.sms) ||
+      false,
+    warrantyEmailNotification:
+      (currentItem && currentItem.warranty && currentItem.warranty.email) ||
+      false,
+    warrantyNotifyDaysPrior:
+      (currentItem &&
+        currentItem.warranty &&
+        currentItem.warranty.days_prior) ||
+      "",
 
     // Payment section
-    paymentMonthly: props.paymentMonthly || false,
-    paymentSectionActive: props.warrantySectionActive || false,
-    paymentStartDate: props.warrantyStartDate || "",
-    paymentDuration: props.warrantyDuration || "",
-    paymentSmsNotification: props.warrantySmsNotification || false,
-    paymentEmailNotification: props.warrantyEmailNotification || false,
-    paymentNotifyDaysPrior: props.warrantyNotifyDaysPrior || "",
-    //File
-    files: null || props.files,
-    //error: "",
+    paymentSectionActive: (currentItem && currentItem.payment) || false,
+    paymentMonthly:
+      (currentItem &&
+        currentItem.payment &&
+        currentItem.payment.duration_in_months) ||
+      false,
+    paymentStartDate:
+      (currentItem &&
+        currentItem.payment &&
+        formatDate(new Date(parseInt(currentItem.payment.start_date, 10)))) ||
+      "",
+    paymentDuration:
+      (currentItem &&
+        currentItem.payment &&
+        currentItem.payment.duration_in_months) ||
+      "",
+    paymentSmsNotification:
+      (currentItem && currentItem.payment && currentItem.payment.sms) || false,
+    paymentEmailNotification:
+      (currentItem && currentItem.payment && currentItem.payment.email) ||
+      false,
+    paymentNotifyDaysPrior:
+      (currentItem && currentItem.payment && currentItem.payment.days_prior) ||
+      "",
   });
 
   // Item section
@@ -69,6 +102,7 @@ export default function Form(props) {
     setState({ ...state, paymentNotifyDaysPrior });
 
   const setFiles = (files) => setState({ ...state, files });
+
   //const setError = (error) => setState({ ...state, error });
 
   const {
@@ -111,13 +145,6 @@ export default function Form(props) {
     return <option key={index}>{category}</option>;
   });
 
-  const fileList = [];
-  for (let key in files) {
-    if (files[key] instanceof File) {
-      fileList.push(<p>{files[key].name}</p>);
-    }
-  }
-
   function validate() {
     if (itemName === "") {
       //setError("Item name cannot be blank");
@@ -151,7 +178,9 @@ export default function Form(props) {
         return;
       }
     }
-
+    if (!warrantySectionActive && !paymentSectionActive) {
+      return;
+    }
     addItem({
       itemName,
       itemCategory,
@@ -168,6 +197,8 @@ export default function Form(props) {
       paymentNotifyDaysPrior,
       paymentMonthly,
       files,
+    }).then(() => {
+      props.setRenderForm(false);
     });
   }
 
@@ -212,6 +243,17 @@ export default function Form(props) {
     }
   }
 
+  function formatDate(date) {
+    var mm = date.getMonth() + 1; // getMonth() is zero-based
+    var dd = date.getDate();
+
+    return [
+      date.getFullYear(),
+      (mm > 9 ? "" : "0") + mm,
+      (dd > 9 ? "" : "0") + dd,
+    ].join("-");
+  }
+
   return (
     <div>
       <button onClick={(e) => props.setRenderForm(false)}>
@@ -250,6 +292,11 @@ export default function Form(props) {
           onChange={(event) =>
             onSectionActiveChange(event.target.checked, "warranty")
           }
+          required={!warrantySectionActive && !paymentSectionActive}
+          onInvalid={(e) =>
+            e.target.setCustomValidity("Please tick either warranty or payment")
+          }
+          onClick={(e) => e.target.setCustomValidity("")}
         ></input>
         <fieldset disabled={!warrantySectionActive}>
           <h3>Warranty</h3>
@@ -313,6 +360,7 @@ export default function Form(props) {
           onChange={(event) =>
             onSectionActiveChange(event.target.checked, "payment")
           }
+          required={!warrantySectionActive && !paymentSectionActive}
         />
         <fieldset disabled={!paymentSectionActive}>
           <h3>Payment</h3>
@@ -383,93 +431,24 @@ export default function Form(props) {
             required={paymentSmsNotification || paymentEmailNotification}
           />
         </fieldset>
-        {fileList}
+        <FileList
+          currentItem={currentItem}
+          setCurrentItem={setCurrentItem}
+          files={files}
+          deleteFile={deleteFile}
+        />
         <input
           type="file"
           files={files}
           multiple
           onChange={(event) => setFiles(event.target.files)}
         />
-        <input type="submit" onClick={validate} value="Save" />
+        <input
+          type="submit"
+          onClick={validate}
+          value={currentItem ? "Update" : "Save"}
+        />
       </form>
     </div>
   );
 }
-
-// import axios from "axios";
-
-// import React, { Component } from "react";
-
-// class App extends Component {
-//   state = {
-//     // Initially, no file is selected
-//     selectedFile: null,
-//   };
-
-//   // On file select (from the pop up)
-//   onFileChange = (event) => {
-//     // Update the state
-//     this.setState({ selectedFile: event.target.files[0] });
-//   };
-
-//   // On file upload (click the upload button)
-//   onFileUpload = () => {
-//     // Create an object of formData
-//     const formData = new FormData();
-
-//     // Update the formData object
-//     formData.append(
-//       "myFile",
-//       this.state.selectedFile,
-//       this.state.selectedFile.name
-//     );
-
-//     // Details of the uploaded file
-//     console.log(this.state.selectedFile);
-
-//     // Request made to the backend api
-//     // Send formData object
-//     axios.post("api/uploadfile", formData);
-//   };
-
-//   // File content to be displayed after
-//   // file upload is complete
-//   fileData = () => {
-//     if (this.state.selectedFile) {
-//       return (
-//         <div>
-//           <h2>File Details:</h2>
-//           <p>File Name: {this.state.selectedFile.name}</p>
-//           <p>File Type: {this.state.selectedFile.type}</p>
-//           <p>
-//             Last Modified:{" "}
-//             {this.state.selectedFile.lastModifiedDate.toDateString()}
-//           </p>
-//         </div>
-//       );
-//     } else {
-//       return (
-//         <div>
-//           <br />
-//           <h4>Choose before Pressing the Upload button</h4>
-//         </div>
-//       );
-//     }
-//   };
-
-//   render() {
-//     return (
-//       <div>
-//         <h1>GeeksforGeeks</h1>
-//         <h3>File Upload using React!</h3>
-//         <div>
-//           <input type="file" name="file" onChange={this.onFileChange} />
-//           <button onClick={this.onFileUpload}>Upload!</button>
-//         </div>
-//         {this.fileData()}
-//       </div>
-//     );
-//   }
-// }
-
-// export default App;

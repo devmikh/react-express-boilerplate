@@ -13,12 +13,15 @@ export default function useApplicationData() {
     transactions: [],
     currentItem: null,
     renderForm: false,
+    renderEditForm: false,
   });
 
   const setTab = (tab) => setState({ ...state, tab }); // Set tab with a tab string
   const setCurrentItem = (currentItem) => setState({ ...state, currentItem });
   const setWarranties = (warranties) => setState({ ...state, warranties });
   const setRenderForm = (renderForm) => setState({ ...state, renderForm });
+  const setRenderEditForm = (renderEditForm) =>
+    setState({ ...state, renderEditForm });
 
   const onFileUpload = (fileObj, itemId) => {
     // Create an object of formData
@@ -45,73 +48,60 @@ export default function useApplicationData() {
           onFileUpload(inputObj.files[key], response.data);
         }
       }
-      // inputObj.files.forEach((file) => {
-      //   onFileUpload(file, response.data);
-      // });
-      // Insert new entry of appointment to the database
-      // const days = updateSpots({ ...state, appointments }); // Calculate remaining spots of updated appointments
-      // setState({ ...state, appointments, days }); // Update state with new days and appointments locally if api request resolves
+
+      populateState();
     });
   }
+  function updateItem(inputObj) {
+    console.log(state.currentItem);
 
-  // // Insert a new interview to local state and remote database
-  // function bookInterview(id, interview) {
-  //   const appointment = {
-  //     // Create a new instance of appointment object with updated interview object
-  //     ...state.appointments[id],
-  //     interview: { ...interview },
-  //   };
+    return axios
+      .post(`/api/items/${state.currentItem.id}`, inputObj)
+      .then((response) => {
+        console.log(inputObj.files);
+        for (let key in inputObj.files) {
+          if (inputObj.files[key] instanceof File) {
+            onFileUpload(inputObj.files[key], response.data);
+          }
+        }
+        //populateState();
+      });
+  }
 
-  //   const appointments = {
-  //     // Create a new instance of appointmens object with updated appointment to corresponding id
-  //     ...state.appointments,
-  //     [id]: appointment,
-  //   };
+  const fetchItemDetails = (id) => {
+    return axios.get(`/api/items/${id}`).then((response) => {
+      setCurrentItem(response.data);
+    });
+  };
 
-  //   return axios
-  //     .put(`/api/appointments/${id}`, { interview: interview })
-  //     .then((response) => {
-  //       // Insert new entry of appointment to the database
-  //       const days = updateSpots({ ...state, appointments }); // Calculate remaining spots of updated appointments
-  //       setState({ ...state, appointments, days }); // Update state with new days and appointments locally if api request resolves
-  //     });
-  // }
-  // Delete an interview to local state and remote database with provided id
-  // function cancelInterview(id) {
-  //   const appointment = {
-  //     // Create a new instance of appointment object with updated interview object
-  //     ...state.appointments[id],
-  //     interview: null,
-  //   };
+  const deleteFile = (id) => {
+    console.log("in deleteFile");
 
-  //   const appointments = {
-  //     // Create a new instance of appointmens object with updated appointment to corresponding id
-  //     ...state.appointments,
-  //     [id]: appointment,
-  //   };
+    return axios.post(`/api/files/${id}/delete`);
+  };
 
-  //   return axios.delete(`/api/appointments/${id}`).then((response) => {
-  //     // Delete corresponding entry of appointment in the database
-  //     const days = updateSpots({ ...state, appointments }); // Calculate remaining spots of updated appointments
-  //     setState({ ...state, appointments, days }); // Update state with new days and appointments locally if api request resolves
-  //   });
-  // }
-
-  // Initialize state with database data
-  useEffect(() => {
+  const populateState = () => {
+    console.log("INSIDE populate()");
     Promise.all([
       axios.get("/api/users/1"),
       axios.get("/api/warranties"),
       // axios.get("/api/interviewers"),
     ]).then(([response, response2]) => {
+      console.log("INSIDE pop", response2.data);
+
       setState((prev) => ({
         ...prev,
         userData: response.data,
         warranties: response2.data,
-        // interviewers: response3.data,
+        // interviewers: response3.data,}
       }));
     });
-  }, []);
+  };
+
+  // Initialize state with database data
+  useEffect(() => {
+    populateState();
+  }, [state.currentItem]);
 
   return {
     state,
@@ -121,5 +111,9 @@ export default function useApplicationData() {
     setWarranties,
     setRenderForm,
     addItem,
+    setRenderEditForm,
+    fetchItemDetails,
+    deleteFile,
+    updateItem,
   };
 }

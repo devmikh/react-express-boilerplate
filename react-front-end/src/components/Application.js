@@ -12,7 +12,11 @@ export default function Application(props) {
     setCurrentItem,
     setWarranties,
     setRenderForm,
+    setRenderEditForm,
     addItem,
+    fetchItemDetails,
+    deleteFile,
+    updateItem,
   } = useApplicationData();
 
   return (
@@ -36,7 +40,11 @@ export default function Application(props) {
           setCurrentItem={setCurrentItem}
           setWarranties={setWarranties}
           setRenderForm={setRenderForm}
+          setRenderEditForm={setRenderEditForm}
           addItem={addItem}
+          fetchItemDetails={fetchItemDetails}
+          deleteFile={deleteFile}
+          updateItem={updateItem}
         />
       </section>
     </main>

@@ -17,6 +17,7 @@ export default function SidebarListItem(props) {
           currentItem: null,
           tab: props.name,
           renderForm: false,
+          renderEditForm: false,
         });
       }}
       className={dayClass}
