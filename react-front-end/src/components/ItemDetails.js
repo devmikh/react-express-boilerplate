@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import DownloadFileList from "./DownloadFileList";
+import FormTransactionList from "./FormTransactionList";
 
 export default function ItemDetails(props) {
   const { currentItem, setCurrentItem } = props;
@@ -55,13 +56,20 @@ export default function ItemDetails(props) {
           <p>Notify by email: {currentItem.payment.email ? "Yes" : "No"}</p>
         </div>
       )}
+      {/* TransactionList */}
+      {currentItem.transactions.length > 0 && (
+        <div style={{ border: "2px solid black" }}>
+          <h1>Transactions</h1>
+          <FormTransactionList transactions={currentItem.transactions} />
+        </div>
+      )}
+
       {/* FileList */}
       {filesDB.length > 0 && (
-        <DownloadFileList
-          // currentItem={currentItem}
-          // setCurrentItem={setCurrentItem}
-          filesDB={filesDB}
-        />
+        <div style={{ border: "2px solid black" }}>
+          <h1>Files</h1>
+          <DownloadFileList filesDB={filesDB} />
+        </div>
       )}
     </div>
   );

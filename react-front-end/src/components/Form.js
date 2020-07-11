@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import FileList from "./FileList";
+import FormTransactionList from "./FormTransactionList";
 
 export default function Form(props) {
   const { addItem, setCurrentItem, deleteFile } = props;
@@ -31,6 +32,7 @@ export default function Form(props) {
     warrantyEmailNotification:
       (currentItem && currentItem.warranty && currentItem.warranty.email) ||
       false,
+    // .sort(compareDateNewest)
     warrantyNotifyDaysPrior:
       (currentItem &&
         currentItem.warranty &&
@@ -62,6 +64,8 @@ export default function Form(props) {
     paymentNotifyDaysPrior:
       (currentItem && currentItem.payment && currentItem.payment.days_prior) ||
       "",
+    transactions: (currentItem && currentItem.transactions) || [],
+    oldTransactions: (currentItem && currentItem.transactions) || [],
   });
 
   // Item section
@@ -102,6 +106,8 @@ export default function Form(props) {
     setState({ ...state, paymentNotifyDaysPrior });
 
   const setFiles = (files) => setState({ ...state, files });
+  const setTransactions = (transactions) =>
+    setState({ ...state, transactions });
 
   //const setError = (error) => setState({ ...state, error });
 
@@ -123,6 +129,8 @@ export default function Form(props) {
     paymentNotifyDaysPrior,
     paymentMonthly,
     files,
+    transactions,
+    oldTransactions,
     //error,
   } = state;
 
@@ -197,19 +205,10 @@ export default function Form(props) {
       paymentNotifyDaysPrior,
       paymentMonthly,
       files,
+      transactions,
+      oldTransactions,
     }).then(() => {
-      // if (currentItem) {
-      //   props.fetchItemDetails(currentItem.id).then(() => {
-      //     props.setRenderForm(false);
-      //   });
-      // } else {
       props.setRenderForm(false);
-      // }
-
-      // console.log(
-      //   "after set render form in form.js",
-      //   props.state.renderEditForm
-      // );
     });
   }
 
@@ -442,6 +441,10 @@ export default function Form(props) {
             required={paymentSmsNotification || paymentEmailNotification}
           />
         </fieldset>
+        <FormTransactionList
+          transactions={transactions}
+          setTransactions={setTransactions}
+        />
         <FileList
           currentItem={currentItem}
           setCurrentItem={setCurrentItem}

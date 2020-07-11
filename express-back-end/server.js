@@ -50,6 +50,7 @@ App.get("/api/payments", (req, res) => {
   });
 });
 
+// Get item details
 App.get("/api/items/:id", (req, res) => {
   let resObj = { id: req.params.id };
   let queryParams = [req.params.id];
@@ -122,17 +123,9 @@ App.get("/api/items/:id", (req, res) => {
       resObj = { ...resObj, filesDB: data.rows };
       res.json(resObj);
     });
-  // db.query(paymentQuery).then((data) => {
-  // queryparams.push(data.rows[0].id)
-  // });
-
-  // db.query(query).then((data) => {
-  //   res.json(data.rows[0]);
-  // });
-  // res.json({ message: "Item fetched" });
-  //{id: 1, files:[], transactions: [], warranty: {}, payment:{}}
 });
 
+// Create a new item
 App.post("/api/items", (req, res) => {
   let {
     itemName,
@@ -149,6 +142,7 @@ App.post("/api/items", (req, res) => {
     paymentEmailNotification,
     paymentNotifyDaysPrior,
     paymentMonthly,
+    transactions,
   } = req.body;
 
   if (warrantyNotifyDaysPrior === "") {
@@ -161,6 +155,8 @@ App.post("/api/items", (req, res) => {
     paymentDuration = 0;
   }
 
+  // Create new item in the items table
+  // return id of the newly created item
   db.query(
     `
     INSERT INTO items (user_id, name, category, description) VALUES (1, $1, $2, $3)
@@ -168,12 +164,14 @@ App.post("/api/items", (req, res) => {
   `,
     [itemName, itemCategory, itemDescription]
   )
+    // after the item is created, make a folder with a returned item id
     .then((data) => {
       let dir = `./uploads/1/${data.rows[0].id}`;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
       }
 
+      // If start date for warranty was passed, create a new warranty entry in the DB
       if (warrantyStartDate) {
         db.query(
           `
@@ -189,10 +187,12 @@ App.post("/api/items", (req, res) => {
           ]
         );
       }
+      // If start date for payment was passed, create a new payment entry in the DB
       if (paymentStartDate) {
         db.query(
           `
-      INSERT INTO entries (item_id, type, duration_in_months, start_date, sms, email, days_prior) VALUES ($1, 'payment', $2, $3, $4, $5, $6);
+      INSERT INTO entries (item_id, type, duration_in_months, start_date, sms, email, days_prior) VALUES ($1, 'payment', $2, $3, $4, $5, $6)
+      RETURNING id;
       `,
           [
             data.rows[0].id,
@@ -202,16 +202,33 @@ App.post("/api/items", (req, res) => {
             paymentEmailNotification,
             paymentNotifyDaysPrior,
           ]
-        );
+          // after the payment was created, loop through passed transactions
+          // and insert a new entry into transactions table using the id of the newly created item
+        ).then((data) => {
+          transactions.forEach((transaction) => {
+            db.query(
+              `
+          INSERT INTO transactions (entry_id, name, amount, date) VALUES ($1, $2, $3, $4);
+          `,
+              [
+                data.rows[0].id,
+                transaction.name,
+                transaction.amount,
+                transaction.date,
+              ]
+            );
+          });
+        });
       }
       res.json(data.rows[0].id);
     })
     .catch((error) => console.log(error));
 });
 //
-// Update
+// Update an item
 //
 App.post("/api/items/:id", (req, res) => {
+  let isTransactionQuery = false;
   let {
     itemName,
     itemCategory,
@@ -227,7 +244,12 @@ App.post("/api/items/:id", (req, res) => {
     paymentEmailNotification,
     paymentNotifyDaysPrior,
     paymentMonthly,
+    transactions,
+    oldTransactions,
   } = req.body;
+
+  console.log("beginning transactions:", transactions);
+  console.log("beginning oldTransactions:", oldTransactions);
 
   if (warrantyNotifyDaysPrior === "") {
     warrantyNotifyDaysPrior = 0;
@@ -259,10 +281,9 @@ App.post("/api/items/:id", (req, res) => {
       if (warrantyStartDate) {
         // select exists(select 1 from contact where id=12
         db.query(
-          `SELECT exists(SELECT 1 FROM entries WHERE id=$1 AND type = 'warranty')`,
+          `SELECT exists(SELECT 1 FROM entries WHERE item_id=$1 AND type = 'warranty')`,
           [req.params.id]
         ).then((data) => {
-          console.log(data.rows[0].exists);
           if (!data.rows[0].exists) {
             db.query(
               `
@@ -312,13 +333,20 @@ App.post("/api/items/:id", (req, res) => {
           [req.params.id]
         );
       }
+      console.log("before payment start date");
+
       if (paymentStartDate) {
+        console.log("in payment start date");
         db.query(
-          `SELECT exists(SELECT 1 FROM entries WHERE id=$1 AND type = 'payment')`,
+          `SELECT exists(SELECT 1 FROM entries WHERE item_id=$1 AND type = 'payment')`,
           [req.params.id]
         ).then((data) => {
+          console.log("1:", data.rows[0]);
+          console.log("2", data.rows[0].exists);
+
           if (!data.rows[0].exists) {
-            console.log("before create payment");
+            console.log("in exist statmenet");
+
             db.query(
               `
           INSERT INTO entries (item_id, type, duration_in_months, start_date, sms, email, days_prior) VALUES ($1, 'payment', $2, $3, $4, $5, $6);
@@ -333,6 +361,8 @@ App.post("/api/items/:id", (req, res) => {
               ]
             );
           } else {
+            console.log("in else statement for update payment");
+            isTransactionQuery = true;
             db.query(
               `
           UPDATE entries
@@ -344,6 +374,7 @@ App.post("/api/items/:id", (req, res) => {
           days_prior = $5
           WHERE type = 'payment'
           AND item_id = $6
+          RETURNING entries.id;
           `,
               [
                 paymentDuration,
@@ -353,7 +384,51 @@ App.post("/api/items/:id", (req, res) => {
                 paymentNotifyDaysPrior,
                 req.params.id,
               ]
-            );
+            ).then((data) => {
+              // const deleteTransactionsList = oldTransactions.filter(
+              //   (transaction) => {
+              //     return !transactions.includes(transaction);
+              //   }
+              // );
+              // console.log("deleteTransactionList:", deleteTransactionsList);
+
+              // const addTransactionsList = transactions.filter((transaction) => {
+              //   return !oldTransactions.includes(transaction);
+              // });
+              // console.log("addTransactionsList", addTransactionsList);
+              //deleteTransactionsList
+              oldTransactions.forEach((transaction) => {
+                db.query(
+                  `
+                DELETE FROM transactions WHERE entry_id = $1 AND name = $2 AND date = $3 AND amount = $4;
+              `,
+                  [
+                    data.rows[0].id,
+                    transaction.name,
+                    transaction.date,
+                    transaction.amount,
+                  ]
+                );
+              });
+
+              //addTransactionsList
+              transactions.forEach((transaction, index) => {
+                db.query(
+                  `
+                INSERT INTO transactions(entry_id, name, date, amount) VALUES($1, $2, $3, $4);
+              `,
+                  [
+                    data.rows[0].id,
+                    transaction.name,
+                    transaction.date,
+                    transaction.amount,
+                  ]
+                ).then((resp) => {
+                  if (index === transactions.length - 1) {
+                  }
+                });
+              });
+            });
           }
         });
       } else {
@@ -366,12 +441,14 @@ App.post("/api/items/:id", (req, res) => {
           [req.params.id]
         );
       }
+
       res.json(data.rows[0].id);
     })
 
     .catch((error) => console.log(error));
 });
 
+// Delete a file
 App.post("/api/files/:id/delete", (req, res) => {
   // res.json({ message: `File deleted! ${req.params.id}` });
 
@@ -385,11 +462,8 @@ App.post("/api/files/:id/delete", (req, res) => {
   });
 });
 
-// File download
+// Download a file
 
-// App.get("/api/files/:name", (req, res) => {
-//   res.download(`./uploads/${req.params.name}`);
-// });
 App.get("/api/files/:id", (req, res) => {
   db.query(
     `
@@ -403,7 +477,7 @@ App.get("/api/files/:id", (req, res) => {
 //
 //
 
-// File uploads
+// Upload a file
 App.post("/api/uploadfile/:id", (req, res) => {
   const itemId = req.params.id;
   // let dir = `./uploads/1/${file.id}`;
