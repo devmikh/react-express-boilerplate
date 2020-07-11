@@ -13,14 +13,34 @@ export default function useApplicationData() {
     transactions: [],
     currentItem: null,
     renderForm: false,
+    renderEditForm: false,
   });
 
   const setTab = (tab) => setState({ ...state, tab }); // Set tab with a tab string
   const setCurrentItem = (currentItem) => setState({ ...state, currentItem });
   const setWarranties = (warranties) => setState({ ...state, warranties });
   const setRenderForm = (renderForm) => setState({ ...state, renderForm });
+  const setRenderEditForm = (renderEditForm) =>
+    setState({ ...state, renderEditForm });
 
   const onFileUpload = (fileObj, itemId) => {
+    // for (let key in files) {
+    //   if (files[key] instanceof File) {
+    //     // Create an object of formData
+    //     const formData = new FormData();
+
+    //     // Update the formData object
+    //     formData.append("file", files[key]);
+
+    //     // Details of the uploaded file
+    //     // console.log("in upload", fileObj);
+
+    //     // Request made to the backend api
+    //     // Send formData object
+    //     return axios.post(`api/uploadfile/${itemId}`, formData);
+    //   }
+    // }
+
     // Create an object of formData
     const formData = new FormData();
 
@@ -32,7 +52,7 @@ export default function useApplicationData() {
 
     // Request made to the backend api
     // Send formData object
-    axios.post(`api/uploadfile/${itemId}`, formData);
+    return axios.post(`api/uploadfile/${itemId}`, formData);
   };
 
   function addItem(inputObj) {
@@ -45,73 +65,75 @@ export default function useApplicationData() {
           onFileUpload(inputObj.files[key], response.data);
         }
       }
-      // inputObj.files.forEach((file) => {
-      //   onFileUpload(file, response.data);
-      // });
-      // Insert new entry of appointment to the database
-      // const days = updateSpots({ ...state, appointments }); // Calculate remaining spots of updated appointments
-      // setState({ ...state, appointments, days }); // Update state with new days and appointments locally if api request resolves
+
+      populateState();
     });
   }
+  function updateItem(inputObj) {
+    // console.log(state.currentItem);
 
-  // // Insert a new interview to local state and remote database
-  // function bookInterview(id, interview) {
-  //   const appointment = {
-  //     // Create a new instance of appointment object with updated interview object
-  //     ...state.appointments[id],
-  //     interview: { ...interview },
-  //   };
+    return axios
+      .post(`/api/items/${state.currentItem.id}`, inputObj)
+      .then((response) => {
+        for (let key in inputObj.files) {
+          if (inputObj.files[key] instanceof File) {
+            onFileUpload(inputObj.files[key], response.data).then(() => {
+              fetchItemDetails(response.data, false);
+            });
+          }
+        }
+        fetchItemDetails(state.currentItem.id, false);
+      });
+  }
 
-  //   const appointments = {
-  //     // Create a new instance of appointmens object with updated appointment to corresponding id
-  //     ...state.appointments,
-  //     [id]: appointment,
-  //   };
-
-  //   return axios
-  //     .put(`/api/appointments/${id}`, { interview: interview })
-  //     .then((response) => {
-  //       // Insert new entry of appointment to the database
-  //       const days = updateSpots({ ...state, appointments }); // Calculate remaining spots of updated appointments
-  //       setState({ ...state, appointments, days }); // Update state with new days and appointments locally if api request resolves
-  //     });
-  // }
-  // Delete an interview to local state and remote database with provided id
-  // function cancelInterview(id) {
-  //   const appointment = {
-  //     // Create a new instance of appointment object with updated interview object
-  //     ...state.appointments[id],
-  //     interview: null,
-  //   };
-
-  //   const appointments = {
-  //     // Create a new instance of appointmens object with updated appointment to corresponding id
-  //     ...state.appointments,
-  //     [id]: appointment,
-  //   };
-
-  //   return axios.delete(`/api/appointments/${id}`).then((response) => {
-  //     // Delete corresponding entry of appointment in the database
-  //     const days = updateSpots({ ...state, appointments }); // Calculate remaining spots of updated appointments
-  //     setState({ ...state, appointments, days }); // Update state with new days and appointments locally if api request resolves
+  // const fetchItemDetails = (id) => {
+  //   return axios.get(`/api/items/${id}`).then((response) => {
+  //     // console.log("inside fetchitemdetails", response.data);
+  //     setCurrentItem(response.data);
   //   });
-  // }
+  // };
 
-  // Initialize state with database data
-  useEffect(() => {
+  const fetchItemDetails = (id, renderEditForm) => {
+    return axios.get(`/api/items/${id}`).then((response) => {
+      console.log("inside fetchitemdetails", response.data);
+      // setCurrentItem(response.data);
+
+      setState({ ...state, currentItem: response.data, renderEditForm });
+    });
+  };
+
+  const deleteFile = (id) => {
+    console.log("in deleteFile");
+
+    return axios.post(`/api/files/${id}/delete`);
+  };
+
+  const populateState = () => {
+    // console.log("INSIDE populate()");
     Promise.all([
       axios.get("/api/users/1"),
       axios.get("/api/warranties"),
       // axios.get("/api/interviewers"),
     ]).then(([response, response2]) => {
+      // console.log("INSIDE pop", response2.data);
+
       setState((prev) => ({
         ...prev,
         userData: response.data,
         warranties: response2.data,
-        // interviewers: response3.data,
+        // interviewers: response3.data,}
       }));
     });
-  }, []);
+  };
+
+  // Initialize state with database data
+  useEffect(() => {
+    populateState();
+  }, [state.currentItem]);
+
+  // useEffect(() => {
+  //   fetchItemDetails();
+  // }, [state.renderEditForm]);
 
   return {
     state,
@@ -121,5 +143,9 @@ export default function useApplicationData() {
     setWarranties,
     setRenderForm,
     addItem,
+    setRenderEditForm,
+    fetchItemDetails,
+    deleteFile,
+    updateItem,
   };
 }

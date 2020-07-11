@@ -3,6 +3,7 @@ import { Progress } from "semantic-ui-react";
 
 export default function WarrantyListItem(props) {
   const {
+    item_id,
     item_name,
     item_category,
     duration_in_months,
@@ -73,7 +74,7 @@ export default function WarrantyListItem(props) {
         />
       </td>
       <td>
-        <button onClick={(e) => props.setCurrentItem({ name: item_name })}>
+        <button onClick={(e) => props.fetchItemDetails(item_id, false)}>
           <i className="fa fa-info-circle" aria-hidden="true"></i>
         </button>
       </td>
