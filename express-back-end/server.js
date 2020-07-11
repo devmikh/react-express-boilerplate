@@ -14,23 +14,40 @@ const dbParams = require("./lib/db.js");
 const db = new Pool(dbParams);
 db.connect();
 
-const { getAllWarrantiesQuery } = require("./lib/dbQueries");
+const {
+  getUserQuery,
+  getAllWarrantiesQuery,
+  getAllPaymentsQuery,
+  getItemDetailsQuery,
+  getWarrantyQuery,
+  getPaymentQuery,
+  getFilesQuery,
+  getTransactionsQuery,
+  addNewItemQuery,
+  addNewWarrantyQuery,
+  addNewPaymentQuery,
+  addNewTransactionQuery,
+  updateItemQuery,
+  checkWarrantyExistsQuery,
+  updateWarrantyQuery,
+  deleteWarrantyQuery,
+  checkPaymentExistsQuery,
+  updatePaymentQuery,
+  deleteTransactionQuery,
+  deletePaymentQuery,
+  deleteFileQuery,
+  getFileUrlQuery,
+  addNewFileQuery,
+} = require("./lib/dbQueries");
 
 // Express Configuration
 App.use(BodyParser.urlencoded({ extended: false }));
 App.use(BodyParser.json());
 App.use(Express.static("public"));
 
-// Sample GET route
-App.get("/api/data", (req, res) =>
-  res.json({
-    message: "Seems to work!",
-  })
-);
-
 App.get("/api/users/:id", (req, res) => {
   let queryParams = [req.params.id];
-  let query = "SELECT * FROM users WHERE id=$1";
+  let query = getUserQuery;
   db.query(query, queryParams).then((data) => {
     res.json(data.rows);
   });
@@ -44,7 +61,7 @@ App.get("/api/warranties", (req, res) => {
 });
 
 App.get("/api/payments", (req, res) => {
-  let query = "SELECT * FROM entries WHERE type='payment'";
+  let query = getAllPaymentsQuery;
   db.query(query).then((data) => {
     res.json(data.rows);
   });
@@ -54,49 +71,14 @@ App.get("/api/payments", (req, res) => {
 App.get("/api/items/:id", (req, res) => {
   let resObj = { id: req.params.id };
   let queryParams = [req.params.id];
-  let itemQuery = `
-    SELECT 
-      id,
-      name,
-      category,
-      description    
-    FROM items
-    WHERE id = $1;
-  `;
+  let itemQuery = getItemDetailsQuery;
 
-  let warrantyQuery = `
-    SELECT 
-      start_date,
-      duration_in_months,
-      sms,
-      email,
-      days_prior
-    FROM entries
-    WHERE type='warranty' AND item_id = $1;
-  `;
+  let warrantyQuery = getWarrantyQuery;
 
-  let paymentQuery = `
-    SELECT 
-      id,
-      start_date,
-      duration_in_months,
-      sms,
-      email,
-      days_prior
-    FROM entries
-    WHERE type='payment' AND item_id = $1;
-  `;
+  let paymentQuery = getPaymentQuery;
 
-  let fileQuery = `
-    SELECT id, name, url
-    FROM files
-    WHERE item_id = $1;
-  `;
-  let transactionQuery = `
-    SELECT name, amount, date
-    FROM transactions
-    WHERE entry_id = $1;
-  `;
+  let fileQuery = getFilesQuery;
+  let transactionQuery = getTransactionsQuery;
 
   db.query(itemQuery, queryParams)
     .then((data) => {
@@ -113,7 +95,6 @@ App.get("/api/items/:id", (req, res) => {
         return db.query(transactionQuery, [data.rows[0].id]);
       }
       return db.query(transactionQuery, [0]);
-      //data.rows ? [data.rows[0].id] :
     })
     .then((data) => {
       resObj = { ...resObj, transactions: data.rows };
@@ -157,13 +138,7 @@ App.post("/api/items", (req, res) => {
 
   // Create new item in the items table
   // return id of the newly created item
-  db.query(
-    `
-    INSERT INTO items (user_id, name, category, description) VALUES (1, $1, $2, $3)
-    RETURNING id;
-  `,
-    [itemName, itemCategory, itemDescription]
-  )
+  db.query(addNewItemQuery, [itemName, itemCategory, itemDescription])
     // after the item is created, make a folder with a returned item id
     .then((data) => {
       let dir = `./uploads/1/${data.rows[0].id}`;
@@ -173,27 +148,19 @@ App.post("/api/items", (req, res) => {
 
       // If start date for warranty was passed, create a new warranty entry in the DB
       if (warrantyStartDate) {
-        db.query(
-          `
-      INSERT INTO entries (item_id, type, duration_in_months, start_date, sms, email, days_prior) VALUES ($1, 'warranty', $2, $3, $4, $5, $6);
-      `,
-          [
-            data.rows[0].id,
-            warrantyDuration,
-            new Date(warrantyStartDate).getTime() + 25200001,
-            warrantySmsNotification,
-            warrantyEmailNotification,
-            warrantyNotifyDaysPrior,
-          ]
-        );
+        db.query(addNewWarrantyQuery, [
+          data.rows[0].id,
+          warrantyDuration,
+          new Date(warrantyStartDate).getTime() + 25200001,
+          warrantySmsNotification,
+          warrantyEmailNotification,
+          warrantyNotifyDaysPrior,
+        ]);
       }
       // If start date for payment was passed, create a new payment entry in the DB
       if (paymentStartDate) {
         db.query(
-          `
-      INSERT INTO entries (item_id, type, duration_in_months, start_date, sms, email, days_prior) VALUES ($1, 'payment', $2, $3, $4, $5, $6)
-      RETURNING id;
-      `,
+          addNewPaymentQuery,
           [
             data.rows[0].id,
             paymentDuration,
@@ -206,17 +173,12 @@ App.post("/api/items", (req, res) => {
           // and insert a new entry into transactions table using the id of the newly created item
         ).then((data) => {
           transactions.forEach((transaction) => {
-            db.query(
-              `
-          INSERT INTO transactions (entry_id, name, amount, date) VALUES ($1, $2, $3, $4);
-          `,
-              [
-                data.rows[0].id,
-                transaction.name,
-                transaction.amount,
-                transaction.date,
-              ]
-            );
+            db.query(addNewTransactionQuery, [
+              data.rows[0].id,
+              transaction.name,
+              transaction.amount,
+              transaction.date,
+            ]);
           });
         });
       }
@@ -224,6 +186,11 @@ App.post("/api/items", (req, res) => {
     })
     .catch((error) => console.log(error));
 });
+`
+  DELETE FROM entries
+  WHERE item_id = $1
+  AND type = 'warranty'
+`;
 //
 // Update an item
 //
@@ -253,6 +220,9 @@ App.post("/api/items/:id", (req, res) => {
 
   if (warrantyNotifyDaysPrior === "") {
     warrantyNotifyDaysPrior = 0;
+    `
+INSERT INTO entries (item_id, type, duration_in_months, start_date, sms, email, days_prior) VALUES ($1, 'payment', $2, $3, $4, $5, $6);
+`;
   }
   if (paymentNotifyDaysPrior === "") {
     paymentNotifyDaysPrior = 0;
@@ -261,17 +231,12 @@ App.post("/api/items/:id", (req, res) => {
     paymentDuration = 0;
   }
 
-  db.query(
-    `
-    UPDATE items 
-    SET name = $1,
-    category = $2,
-    description = $3
-    WHERE id = $4
-    RETURNING id;
-  `,
-    [itemName, itemCategory, itemDescription, req.params.id]
-  )
+  db.query(updateItemQuery, [
+    itemName,
+    itemCategory,
+    itemDescription,
+    req.params.id,
+  ])
     .then((data) => {
       let dir = `./uploads/1/${data.rows[0].id}`;
       if (!fs.existsSync(dir)) {
@@ -279,112 +244,69 @@ App.post("/api/items/:id", (req, res) => {
       }
 
       if (warrantyStartDate) {
-        // select exists(select 1 from contact where id=12
-        db.query(
-          `SELECT exists(SELECT 1 FROM entries WHERE item_id=$1 AND type = 'warranty')`,
-          [req.params.id]
-        ).then((data) => {
+        db.query(checkWarrantyExistsQuery, [req.params.id]).then((data) => {
           if (!data.rows[0].exists) {
-            db.query(
-              `
-          INSERT INTO entries (item_id, type, duration_in_months, start_date, sms, email, days_prior) VALUES ($1, 'warranty', $2, $3, $4, $5, $6);
-          `,
-              [
-                req.params.id,
-                warrantyDuration,
-                new Date(warrantyStartDate).getTime() + 25200001,
-                warrantySmsNotification,
-                warrantyEmailNotification,
-                warrantyNotifyDaysPrior,
-              ]
-            );
+            db.query(addNewWarrantyQuery, [
+              req.params.id,
+              warrantyDuration,
+              new Date(warrantyStartDate).getTime() + 25200001,
+              warrantySmsNotification,
+              warrantyEmailNotification,
+              warrantyNotifyDaysPrior,
+            ]);
           } else {
-            db.query(
-              `
-              UPDATE entries
-              SET
-              duration_in_months = $1,
-              start_date = $2,
-              sms = $3,
-              email = $4,
-              days_prior = $5
-              WHERE type = 'warranty'
-              AND item_id = $6
-            
-          `,
-              [
-                warrantyDuration,
-                new Date(warrantyStartDate).getTime() + 25200001,
-                warrantySmsNotification,
-                warrantyEmailNotification,
-                warrantyNotifyDaysPrior,
-                req.params.id,
-              ]
-            );
+            db.query(updateWarrantyQuery, [
+              warrantyDuration,
+              new Date(warrantyStartDate).getTime() + 25200001,
+              warrantySmsNotification,
+              warrantyEmailNotification,
+              warrantyNotifyDaysPrior,
+              req.params.id,
+            ]);
           }
         });
       } else {
-        db.query(
-          `
-            DELETE FROM entries
-            WHERE item_id = $1
-            AND type = 'warranty'
-          `,
-          [req.params.id]
-        );
+        db.query(deleteWarrantyQuery, [req.params.id]);
       }
       console.log("before payment start date");
 
       if (paymentStartDate) {
         console.log("in payment start date");
-        db.query(
-          `SELECT exists(SELECT 1 FROM entries WHERE item_id=$1 AND type = 'payment')`,
-          [req.params.id]
-        ).then((data) => {
+        db.query(checkPaymentExistsQuery, [req.params.id]).then((data) => {
           console.log("1:", data.rows[0]);
           console.log("2", data.rows[0].exists);
 
           if (!data.rows[0].exists) {
             console.log("in exist statmenet");
 
-            db.query(
-              `
-          INSERT INTO entries (item_id, type, duration_in_months, start_date, sms, email, days_prior) VALUES ($1, 'payment', $2, $3, $4, $5, $6);
-          `,
-              [
-                req.params.id,
-                paymentDuration,
-                new Date(paymentStartDate).getTime() + 25200001,
-                paymentSmsNotification,
-                paymentEmailNotification,
-                paymentNotifyDaysPrior,
-              ]
-            );
+            db.query(addNewPaymentQuery, [
+              req.params.id,
+              paymentDuration,
+              new Date(paymentStartDate).getTime() + 25200001,
+              paymentSmsNotification,
+              paymentEmailNotification,
+              paymentNotifyDaysPrior,
+            ]).then((data) => {
+              transactions.forEach((transaction) => {
+                db.query(addNewTransactionQuery, [
+                  data.rows[0].id,
+                  transaction.name,
+                  transaction.amount,
+                  transaction.date,
+                ]);
+              });
+            });
           } else {
             console.log("in else statement for update payment");
             isTransactionQuery = true;
-            db.query(
-              `
-          UPDATE entries
-          SET
-          duration_in_months = $1,
-          start_date = $2,
-          sms = $3,
-          email = $4,
-          days_prior = $5
-          WHERE type = 'payment'
-          AND item_id = $6
-          RETURNING entries.id;
-          `,
-              [
-                paymentDuration,
-                new Date(paymentStartDate).getTime() + 25200001,
-                paymentSmsNotification,
-                paymentEmailNotification,
-                paymentNotifyDaysPrior,
-                req.params.id,
-              ]
-            ).then((data) => {
+            db.query(updatePaymentQuery, [
+              paymentDuration,
+              new Date(paymentStartDate).getTime() + 25200001,
+              paymentSmsNotification,
+              paymentEmailNotification,
+              paymentNotifyDaysPrior,
+              req.params.id,
+            ]).then((data) => {
               // const deleteTransactionsList = oldTransactions.filter(
               //   (transaction) => {
               //     return !transactions.includes(transaction);
@@ -398,51 +320,38 @@ App.post("/api/items/:id", (req, res) => {
               // console.log("addTransactionsList", addTransactionsList);
               //deleteTransactionsList
               oldTransactions.forEach((transaction) => {
-                db.query(
-                  `
-                DELETE FROM transactions WHERE entry_id = $1 AND name = $2 AND date = $3 AND amount = $4;
-              `,
-                  [
-                    data.rows[0].id,
-                    transaction.name,
-                    transaction.date,
-                    transaction.amount,
-                  ]
-                );
+                db.query(deleteTransactionQuery, [
+                  data.rows[0].id,
+                  transaction.name,
+                  transaction.date,
+                  transaction.amount,
+                ]);
               });
 
               //addTransactionsList
-              transactions.forEach((transaction, index) => {
-                db.query(
-                  `
-                INSERT INTO transactions(entry_id, name, date, amount) VALUES($1, $2, $3, $4);
-              `,
-                  [
+              setTimeout(() => {
+                transactions.forEach((transaction, index) => {
+                  db.query(addNewTransactionQuery, [
                     data.rows[0].id,
                     transaction.name,
-                    transaction.date,
                     transaction.amount,
-                  ]
-                ).then((resp) => {
-                  if (index === transactions.length - 1) {
-                  }
+                    transaction.date,
+                  ]).then((resp) => {
+                    if (index === transactions.length - 1) {
+                    }
+                  });
                 });
-              });
+              }, oldTransactions.length * 10);
             });
           }
         });
       } else {
-        db.query(
-          `
-            DELETE FROM entries
-            WHERE item_id = $1
-            AND type = 'payment'
-          `,
-          [req.params.id]
-        );
+        db.query(deletePaymentQuery, [req.params.id]);
       }
-
-      res.json(data.rows[0].id);
+      setTimeout(
+        () => res.json(data.rows[0].id),
+        (oldTransactions.length + transactions.length) * 10
+      );
     })
 
     .catch((error) => console.log(error));
@@ -452,10 +361,7 @@ App.post("/api/items/:id", (req, res) => {
 App.post("/api/files/:id/delete", (req, res) => {
   // res.json({ message: `File deleted! ${req.params.id}` });
 
-  let query = `
-    DELETE FROM files WHERE id = $1
-    RETURNING url;
-  `;
+  let query = deleteFileQuery;
   db.query(query, [req.params.id]).then((data) => {
     fs.unlinkSync(data.rows[0].url);
     res.json("hello");
@@ -465,12 +371,7 @@ App.post("/api/files/:id/delete", (req, res) => {
 // Download a file
 
 App.get("/api/files/:id", (req, res) => {
-  db.query(
-    `
-          SELECT url From files Where id = $1
-          `,
-    [req.params.id]
-  ).then((data) => {
+  db.query(getFileUrlQuery, [req.params.id]).then((data) => {
     res.download(data.rows[0].url);
   });
 });
@@ -505,12 +406,11 @@ App.post("/api/uploadfile/:id", (req, res) => {
       return res.status(500).json(err);
     }
     console.log(req.file.filename);
-    db.query(
-      `
-            INSERT INTO files (item_id, name, url) VALUES ($1, $2, $3);
-            `,
-      [itemId, req.file.filename, folderPath + req.file.filename]
-    );
+    db.query(addNewFileQuery, [
+      itemId,
+      req.file.filename,
+      folderPath + req.file.filename,
+    ]);
     return res.status(200).send(req.file);
   });
 });
