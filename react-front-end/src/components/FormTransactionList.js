@@ -12,7 +12,7 @@ export default function FormTransactionList(props) {
   //     })
   //   : [];
 
-  const { transactions, setTransactions } = props;
+  const { transactions, setTransactions, fetchItemDetails } = props;
 
   function compareDateNewest(a, b) {
     if (parseInt(a.date, 10) > parseInt(b.date, 10)) return -1;
@@ -42,6 +42,7 @@ export default function FormTransactionList(props) {
           key={index}
           transaction={transaction}
           onDelete={setTransactions && onDelete}
+          fetchItemDetails={fetchItemDetails || false}
         />
       );
     });
@@ -62,6 +63,7 @@ export default function FormTransactionList(props) {
             <AddTransactionForm
               transactions={transactions}
               setTransactions={setTransactions}
+              setError={props.setError}
             />
           )}
           {transactions.length > 0 && formTransactionListItems}

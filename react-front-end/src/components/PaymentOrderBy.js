@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-export default function OrderBy(props) {
+export default function PaymentOrderBy(props) {
   const { state, setState } = props;
   // let day2 = new Date(Date.now() + 20000000000);
   function monthDiff(d1, d2) {
@@ -10,11 +10,11 @@ export default function OrderBy(props) {
     months += d2.getMonth();
     return months <= 0 ? 0 : months;
   }
-  function monthsLeft(warranty) {
+  function monthsLeft(payment) {
     return (
-      warranty.duration_in_months -
+      payment.duration_in_months -
       monthDiff(
-        new Date(parseInt(warranty.start_date, 10)),
+        new Date(parseInt(payment.start_date, 10)),
         new Date(Date.now())
       )
     );
@@ -44,30 +44,27 @@ export default function OrderBy(props) {
     return 0;
   }
 
-  // const sorted = state.displayedWarranties.sort(compareDateNewest);
-  // console.log(sorted);
-
   useEffect(() => {
     let sorted;
     switch (state.orderBy) {
       case "Newest":
-        sorted = state.displayedWarranties.sort(compareDateNewest);
+        sorted = state.displayedPayments.sort(compareDateNewest);
         break;
       case "Oldest":
-        sorted = state.displayedWarranties.sort(compareDateOldest);
+        sorted = state.displayedPayments.sort(compareDateOldest);
         break;
       case `Months left ↑`:
-        sorted = state.displayedWarranties.sort(compareMonthsLeftSmallest);
+        sorted = state.displayedPayments.sort(compareMonthsLeftSmallest);
         break;
       case `Months left ↓`:
-        sorted = state.displayedWarranties.sort(compareMonthsLeftLargest);
+        sorted = state.displayedPayments.sort(compareMonthsLeftLargest);
         break;
       default:
     }
 
     setState((state) => ({
       ...state,
-      displayedWarranties: sorted,
+      displayedPayments: sorted,
     }));
   }, [state.orderBy, state.searchResult]);
 

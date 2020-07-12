@@ -8,7 +8,18 @@ const getAllWarrantiesQuery = `
 `;
 
 const getAllPaymentsQuery = `
-  SELECT * FROM entries WHERE type='payment';
+SELECT entries.*, items.name as item_name, items.category as item_category
+FROM entries
+JOIN items ON items.id = entries.item_id
+WHERE type='payment'
+AND duration_in_months > 0;
+`;
+
+const getAllTransactionsQuery = `
+  SELECT transactions.*, entries.item_id as item_id
+  FROM transactions
+  JOIN entries ON entries.id = transactions.entry_id
+  WHERE type='payment';
 `;
 
 const getItemDetailsQuery = `
@@ -141,7 +152,7 @@ const getFileUrlQuery = `
   SELECT url From files Where id = $1
 `;
 
-const addNewFileQUery = `
+const addNewFileQuery = `
   INSERT INTO files (item_id, name, url) VALUES ($1, $2, $3);
 `;
 
@@ -149,6 +160,7 @@ module.exports = {
   getUserQuery,
   getAllWarrantiesQuery,
   getAllPaymentsQuery,
+  getAllTransactionsQuery,
   getItemDetailsQuery,
   getWarrantyQuery,
   getPaymentQuery,
@@ -168,5 +180,5 @@ module.exports = {
   deletePaymentQuery,
   deleteFileQuery,
   getFileUrlQuery,
-  addNewFileQUery,
+  addNewFileQuery,
 };

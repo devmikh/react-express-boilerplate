@@ -113,15 +113,17 @@ export default function useApplicationData() {
     Promise.all([
       axios.get("/api/users/1"),
       axios.get("/api/warranties"),
-      // axios.get("/api/interviewers"),
-    ]).then(([response, response2]) => {
+      axios.get("/api/payments"),
+      axios.get("/api/transactions"),
+    ]).then(([response, response2, response3, response4]) => {
       // console.log("INSIDE pop", response2.data);
 
       setState((prev) => ({
         ...prev,
         userData: response.data,
         warranties: response2.data,
-        // interviewers: response3.data,}
+        payments: response3.data,
+        transactions: response4.data,
       }));
     });
   };

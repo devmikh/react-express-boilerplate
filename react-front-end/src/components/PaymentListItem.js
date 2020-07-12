@@ -1,14 +1,14 @@
 import React from "react";
 import { Progress } from "semantic-ui-react";
 
-export default function WarrantyListItem(props) {
+export default function PaymentListItem(props) {
   const {
     item_id,
     item_name,
     item_category,
     duration_in_months,
     start_date,
-  } = props.warranty;
+  } = props.payment;
   // refactor
   let day1 = new Date(parseInt(start_date, 10));
   let day2 = new Date(Date.now());
@@ -22,11 +22,8 @@ export default function WarrantyListItem(props) {
   // console.log(monthDiff(day1, day2));
   // console.log(day2);
   let passedMonths = monthDiff(day1, day2);
-  let status = [false, false, false, false];
-  if (passedMonths / duration_in_months >= 1) {
-    status[3] = true;
-    passedMonths = duration_in_months;
-  } else if (passedMonths / duration_in_months > 0.75) {
+  let status = [false, false, false];
+  if (passedMonths / duration_in_months > 0.75) {
     status[0] = true;
   } else if (passedMonths / duration_in_months > 0.25) {
     status[1] = true;
@@ -115,7 +112,6 @@ export default function WarrantyListItem(props) {
           error={status[0]}
           warning={status[1]}
           success={status[2]}
-          disabled={status[3]}
         />
       </td>
       <td>

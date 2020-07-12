@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import UserProfile from "./UserProfile";
 import Warranties from "./Warranties";
+import Payments from "./Payments";
+import Transactions from "./Transactions";
 import Form from "./Form";
 import ItemDetails from "./ItemDetails";
 
@@ -25,11 +27,25 @@ export default function Tab(props) {
           />
         );
       case "Monthly Payments":
-        // return <Payments />;
-        return <p>{props.name}</p>;
+        return (
+          <Payments
+            payments={props.state.payments}
+            transactions={props.state.transactions}
+            setCurrentItem={props.setCurrentItem}
+            setRenderForm={props.setRenderForm}
+            fetchItemDetails={props.fetchItemDetails}
+          />
+        );
+      // return <p>{props.name}</p>;
       case "Transactions":
-        // return <Transactions />;
-        return <p>{props.name}</p>;
+        return (
+          <Transactions
+            transactions={props.state.transactions}
+            setRenderForm={props.setRenderForm}
+            fetchItemDetails={props.fetchItemDetails}
+          />
+        );
+      // return <p>{props.name}</p>;
       default:
         return;
     }
