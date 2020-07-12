@@ -42,6 +42,18 @@ export default function AddTransactionForm(props) {
     // }else {
     //   transactionList.push(transaction)
     // }
+    const includesArr = props.transactions.filter((trans) => {
+      return (
+        trans.name === transaction.name &&
+        trans.amount === transaction.amount &&
+        trans.date === transaction.date
+      );
+    });
+
+    if (includesArr.length > 0) {
+      props.setError("You Cannot Create Duplicate Transactions");
+      return;
+    }
 
     props.setTransactions([...props.transactions, transaction]);
     setState({

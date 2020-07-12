@@ -7,7 +7,7 @@ export default function DownloadFileListItem(props) {
     <div>
       <a href={`http://localhost:8080/api/files/${id}`} download>
         {name}
-        <i class="fa fa-download" aria-hidden="true"></i>
+        <i className="fa fa-download" aria-hidden="true"></i>
       </a>
     </div>
   );

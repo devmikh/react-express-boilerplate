@@ -66,6 +66,7 @@ export default function Form(props) {
       "",
     transactions: (currentItem && currentItem.transactions) || [],
     oldTransactions: (currentItem && currentItem.transactions) || [],
+    error: "",
   });
 
   // Item section
@@ -109,7 +110,7 @@ export default function Form(props) {
   const setTransactions = (transactions) =>
     setState({ ...state, transactions });
 
-  //const setError = (error) => setState({ ...state, error });
+  const setError = (error) => setState({ ...state, error });
 
   const {
     itemName,
@@ -131,15 +132,15 @@ export default function Form(props) {
     files,
     transactions,
     oldTransactions,
-    //error,
+    error,
   } = state;
 
   const categoryOptions = [
     "Other",
-    "Personal and Household",
+    "Personal and Household", //
     "Transportation",
     "Grocery and Retail",
-    "Hotels, Entertainment, and Recreation",
+    "Entertainment",
     "Restaurants",
     "Health and Education",
     "Sports Equipment",
@@ -177,6 +178,14 @@ export default function Form(props) {
       }
     if (paymentMonthly) {
       if (!paymentDuration) {
+        return;
+      }
+    } else {
+      if (transactions.length === 0) {
+        setError("Transaction Cannot Be Empty");
+        return;
+      } else if (transactions.length > 1) {
+        setError("One-Time Payment Should Only Have One Transaction");
         return;
       }
     }
@@ -441,9 +450,11 @@ export default function Form(props) {
             required={paymentSmsNotification || paymentEmailNotification}
           />
         </fieldset>
+        <p>{error}</p>
         <FormTransactionList
           transactions={transactions}
           setTransactions={setTransactions}
+          setError={setError}
         />
         <FileList
           currentItem={currentItem}

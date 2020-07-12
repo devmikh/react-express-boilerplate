@@ -18,6 +18,7 @@ const {
   getUserQuery,
   getAllWarrantiesQuery,
   getAllPaymentsQuery,
+  getAllTransactionsQuery,
   getItemDetailsQuery,
   getWarrantyQuery,
   getPaymentQuery,
@@ -62,6 +63,13 @@ App.get("/api/warranties", (req, res) => {
 
 App.get("/api/payments", (req, res) => {
   let query = getAllPaymentsQuery;
+  db.query(query).then((data) => {
+    res.json(data.rows);
+  });
+});
+
+App.get("/api/transactions", (req, res) => {
+  let query = getAllTransactionsQuery;
   db.query(query).then((data) => {
     res.json(data.rows);
   });

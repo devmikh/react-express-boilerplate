@@ -51,7 +51,11 @@ export default function ItemDetails(props) {
           <p>
             {formatDate(new Date(parseInt(currentItem.payment.start_date, 10)))}
           </p>
-          <p>{currentItem.payment.duration_in_months}</p>
+          <p>
+            {currentItem.payment.duration_in_months === 0
+              ? "One-Time"
+              : currentItem.payment.duration_in_months}
+          </p>
           <p>Notify by sms: {currentItem.payment.sms ? "Yes" : "No"}</p>
           <p>Notify by email: {currentItem.payment.email ? "Yes" : "No"}</p>
         </div>

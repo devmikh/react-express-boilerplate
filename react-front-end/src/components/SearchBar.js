@@ -21,6 +21,7 @@ export default function SearchBar(props) {
           type="text"
           value={value}
           onChange={(event) => setValue(event.target.value)}
+          autoComplete="off"
         />
       </form>
     </section>

@@ -11,6 +11,7 @@ export default function FormTransactionListItem(props) {
       (dd > 9 ? "" : "0") + dd,
     ].join("-");
   }
+
   return (
     <tr>
       <td>{formatDate(new Date(parseInt(props.transaction.date, 10)))}</td>
@@ -28,6 +29,17 @@ export default function FormTransactionListItem(props) {
             }}
           >
             <i className="fa fa-trash" aria-hidden="true"></i>
+          </button>
+        </td>
+      )}
+      {props.fetchItemDetails && (
+        <td>
+          <button
+            onClick={(e) =>
+              props.fetchItemDetails(props.transaction.item_id, false)
+            }
+          >
+            <i className="fa fa-info-circle" aria-hidden="true"></i>
           </button>
         </td>
       )}
