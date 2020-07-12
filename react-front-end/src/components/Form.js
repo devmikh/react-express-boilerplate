@@ -172,21 +172,22 @@ export default function Form(props) {
         }
       }
     }
-    if (paymentSectionActive)
+    if (paymentSectionActive) {
       if (!paymentStartDate) {
         return;
       }
-    if (paymentMonthly) {
-      if (!paymentDuration) {
-        return;
-      }
-    } else {
-      if (transactions.length === 0) {
-        setError("Transaction Cannot Be Empty");
-        return;
-      } else if (transactions.length > 1) {
-        setError("One-Time Payment Should Only Have One Transaction");
-        return;
+      if (paymentMonthly) {
+        if (!paymentDuration) {
+          return;
+        }
+      } else {
+        if (transactions.length === 0) {
+          setError("Transaction Cannot Be Empty");
+          return;
+        } else if (transactions.length > 1) {
+          setError("One-Time Payment Should Only Have One Transaction");
+          return;
+        }
       }
     }
 

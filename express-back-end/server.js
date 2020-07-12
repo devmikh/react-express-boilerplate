@@ -2,7 +2,8 @@ require("dotenv").config();
 
 const Express = require("express");
 const multer = require("multer");
-const formidable = require("formidable");
+// const formidable = require("formidable");
+const nodemailer = require("nodemailer");
 const App = Express();
 const fs = require("fs");
 const BodyParser = require("body-parser");
@@ -45,6 +46,240 @@ const {
 App.use(BodyParser.urlencoded({ extended: false }));
 App.use(BodyParser.json());
 App.use(Express.static("public"));
+
+// days_prior check
+
+// email stuff
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+// sms stuff
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = require("twilio")(accountSid, authToken);
+
+// console.log(Date.now());
+
+// let now = Date.now();
+// let notify_at = Date.now() + 10000;
+// let n = 0;
+function addMonths(date, months) {
+  var d = date.getDate();
+  date.setMonth(date.getMonth() + +months);
+  if (date.getDate() != d) {
+    date.setDate(0);
+  }
+  return date;
+}
+function formatDate(date) {
+  var d = new Date(date),
+    month = "" + (d.getMonth() + 1),
+    day = "" + d.getDate(),
+    year = d.getFullYear();
+
+  if (month.length < 2) month = "0" + month;
+  if (day.length < 2) day = "0" + day;
+
+  return [year, month, day].join("-");
+}
+
+let paymentNotificationLog = {};
+
+setInterval(async () => {
+  handleWarrantyNotifications();
+  handlePaymentNotifications();
+}, 10000);
+
+// handlePaymentNotifications();
+
+function handlePaymentNotifications() {
+  db.query(getAllPaymentsQuery).then((data) => {
+    data.rows.forEach((payment) => {
+      let finalDueDate = addMonths(
+        new Date(parseInt(payment.start_date, 10)),
+        payment.duration_in_months
+      );
+      if (Date.now() < finalDueDate.getTime()) {
+        if (!paymentNotificationLog[payment.id]) {
+          paymentNotificationLog[payment.id] = {};
+        }
+
+        let startDate = new Date(parseInt(payment.start_date, 10));
+        if (new Date().getDate() < startDate.getDate()) {
+          console.log("before ", payment.item_name);
+          let dueDate = new Date(new Date().setDate(startDate.getDate()));
+          console.log(dueDate);
+          if (
+            Date.now() >= dueDate.getTime() - payment.days_prior * 86400000 &&
+            !paymentNotificationLog[payment.id][dueDate.getMonth()] &&
+            payment.days_prior > 0
+          ) {
+            let message = `Your payment for ${
+              payment.item_name
+            } is due on ${formatDate(dueDate)}.`;
+
+            if (payment.sms) {
+              client.messages
+                .create({
+                  body: message,
+                  from: "+15876000586",
+                  to: "+17787088227",
+                })
+                .then((message) => console.log(message.sid));
+            }
+
+            if (payment.email) {
+              const mailOptions = {
+                from: "wardentechnology@gmail.com",
+                to: "mishacyb@gmail.com, danielzhang95@hotmail.com",
+                subject: "Payment Notification",
+                text: message,
+              };
+              transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log("Email sent: " + info.response);
+                }
+              });
+            }
+            paymentNotificationLog[payment.id][dueDate.getMonth()] = true;
+          }
+        } else {
+          let dueDate = new Date(new Date().setDate(startDate.getDate()));
+          dueDate = addMonths(dueDate, 1);
+          console.log("start date", startDate);
+
+          console.log("due after", dueDate);
+          if (
+            Date.now() >= dueDate.getTime() - payment.days_prior * 86400000 &&
+            !paymentNotificationLog[payment.id][dueDate.getMonth()] &&
+            payment.days_prior > 0
+          ) {
+            let message = `Your payment for ${
+              payment.item_name
+            } is due on ${formatDate(dueDate)}.`;
+
+            if (payment.sms) {
+              client.messages
+                .create({
+                  body: message,
+                  from: "+15876000586",
+                  to: "+17787088227",
+                })
+                .then((message) => console.log(message.sid));
+            }
+
+            if (payment.email) {
+              const mailOptions = {
+                from: "wardentechnology@gmail.com",
+                to: "mishacyb@gmail.com, danielzhang95@hotmail.com",
+                subject: "Payment Notification",
+                text: message,
+              };
+              transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log("Email sent: " + info.response);
+                }
+              });
+            }
+            paymentNotificationLog[payment.id][dueDate.getMonth()] = true;
+          }
+        }
+      }
+    });
+  });
+}
+
+function handleWarrantyNotifications() {
+  db.query(getAllWarrantiesQuery).then((data) => {
+    data.rows.forEach((warranty) => {
+      if (warranty.days_prior > 0) {
+        let expirationDate = addMonths(
+          new Date(parseInt(warranty.start_date, 10)),
+          warranty.duration_in_months
+        );
+        let datePrior =
+          expirationDate.getTime() - warranty.days_prior * 86400000;
+
+        if (Date.now() >= datePrior) {
+          let message = `Your warranty for ${
+            warranty.item_name
+          } expires on ${formatDate(expirationDate)}.`;
+          if (warranty.sms) {
+            client.messages
+              .create({
+                body: message,
+                from: "+15876000586",
+                to: "+17787088227",
+              })
+              .then((message) => console.log(message.sid));
+          }
+          if (warranty.email) {
+            // send email
+            const mailOptions = {
+              from: "wardentechnology@gmail.com",
+              to: "mishacyb@gmail.com, danielzhang95@hotmail.com",
+              subject: "Warranty Expiration Notification",
+              text: message,
+            };
+
+            transporter.sendMail(mailOptions, function (error, info) {
+              if (error) {
+                console.log(error);
+              } else {
+                console.log("Email sent: " + info.response);
+              }
+            });
+
+            db.query(
+              `
+              UPDATE entries SET days_prior = 0 WHERE id = $1;
+            `,
+              [warranty.id]
+            );
+          }
+        }
+      }
+    });
+  });
+}
+
+// if (Date.now() > notify_at && n === 0) {
+//   await client.messages
+//     .create({
+//       body: "Hello from Node",
+//       from: "+15876000586",
+//       to: "+17787088227",
+//     })
+//     .then((message) => console.log(message.sid));
+//   n++;
+// }
+
+// client.messages
+//   .create({
+//     body: "This is the ship that made the Kessel Run in fourteen parsecs?",
+//     from: "+15876000586",
+//     to: "+16044016745",
+//   })
+//   .then((message) => console.log(message.sid));
+
+// let mills = Date.now();
+// let date = new Date(mills);
+// console.log(mills);
+// console.log(date.getTime());
+
+// 1593912515028
+// 1593912515028
+
+// 2020-07-05T01:24:50.405Z
 
 App.get("/api/users/:id", (req, res) => {
   let queryParams = [req.params.id];
