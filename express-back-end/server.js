@@ -91,8 +91,8 @@ function formatDate(date) {
 let paymentNotificationLog = {};
 
 setInterval(async () => {
-  handleWarrantyNotifications();
-  handlePaymentNotifications();
+  // handleWarrantyNotifications();
+  // handlePaymentNotifications();
 }, 10000);
 
 // handlePaymentNotifications();

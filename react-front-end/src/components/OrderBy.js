@@ -75,6 +75,7 @@ export default function OrderBy(props) {
     <div>
       <label>Order By: </label>
       <select
+        className="select-css"
         value={state.orderBy}
         onChange={(event) =>
           setState({ ...state, orderBy: event.target.value })

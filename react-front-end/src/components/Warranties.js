@@ -4,6 +4,7 @@ import CategoryFilter from "./CategoryFilter";
 import Search from "./Search";
 import OrderBy from "./OrderBy";
 import WarrantyDashboard from "./WarrantyDashboard";
+import "./Tab.scss";
 
 export default function Warranties(props) {
   // const warrantyItems = props.warranties.map((warranty) => {
@@ -39,25 +40,25 @@ export default function Warranties(props) {
   }, [props.warranties]);
   // console.log("Warranties.js rerender");
   return (
-    <div>
+    <div className="tab">
       <WarrantyDashboard warranties={state.warranties} />
-      <Search state={state} setState={setState} />
-      <CategoryFilter state={state} setState={setState} />
-      {/* setCategoryFilter={setCategoryFilter} */}
-      <OrderBy state={state} setState={setState} />
+      <div className="search-filter-container">
+        <Search state={state} setState={setState} />
+        <div className="filter-container">
+          <CategoryFilter state={state} setState={setState} />
+          <OrderBy state={state} setState={setState} />
+        </div>
+      </div>
 
-      <button onClick={(e) => props.setRenderForm(true)}>
+      <button className="button-add" onClick={(e) => props.setRenderForm(true)}>
         <i className="fa fa-plus" aria-hidden="true"></i>
+        <span>Add Item</span>
       </button>
       <WarrantyList
         warranties={state.displayedWarranties}
         setCurrentItem={props.setCurrentItem}
         fetchItemDetails={props.fetchItemDetails}
       />
-      {/* {warrantyItems} */}
-      {/* {props.warranties.map((warranty) => (
-        <WarrantyListItem warranty={warranty} />
-      ))} */}
     </div>
   );
 }

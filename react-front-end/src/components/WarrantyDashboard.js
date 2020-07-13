@@ -1,6 +1,7 @@
 import React from "react";
-import { VictoryPie } from "victory";
+import { VictoryPie, VictoryTheme } from "victory";
 import Card from "./Card";
+import "./WarrantyDashboard.scss";
 
 export default function WarrantyDashboard(props) {
   const { warranties } = props;
@@ -56,28 +57,42 @@ export default function WarrantyDashboard(props) {
   }).length;
 
   return (
-    <div style={{ width: "60%" }}>
-      <VictoryPie data={data} height={200} style={{ width: "50%" }} />
-      <Card
-        title="Total Warranties"
-        total={warranties.length}
-        icon={"fa fa-file-text fa-5x"}
-      />
-      <Card
-        title="Total Safe"
-        total={greenWarranties}
-        icon={"fa fa-file-text fa-5x"}
-      />
-      <Card
-        title="Total Caution"
-        total={yellowWarranties}
-        icon={"fa fa-file-text fa-5x"}
-      />
-      <Card
-        title="Total Danger"
-        total={redWarranties}
-        icon={"fa fa-file-text fa-5x"}
-      />
+    <div className="warranty-dashboard">
+      <div className="warranty-dashboard-chart-container">
+        <VictoryPie
+          data={data}
+          height={240}
+          style={{ width: "50%" }}
+          theme={VictoryTheme.material}
+        />
+      </div>
+      <div className="column-1">
+        <Card
+          title="Total Warranties"
+          total={warranties.length}
+          icon={"fa fa-file-text fa-5x"}
+        />
+        <Card
+          title="Total Safe"
+          total={greenWarranties}
+          icon={"fa fa-check fa-5x"}
+          safe
+        />
+      </div>
+      <div className="column-2">
+        <Card
+          title="Total Caution"
+          total={yellowWarranties}
+          icon={"fa fa-exclamation-triangle fa-5x"}
+          caution
+        />
+        <Card
+          title="Total Danger"
+          total={redWarranties}
+          icon={"fa fa-exclamation-triangle fa-5x"}
+          danger
+        />
+      </div>
     </div>
   );
 }

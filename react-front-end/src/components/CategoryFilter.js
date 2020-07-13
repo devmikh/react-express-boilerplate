@@ -31,6 +31,7 @@ export default function CategoryFilter(props) {
     <div>
       <label>Category: </label>
       <select
+        className="select-css"
         value={state.categoryFilter}
         onChange={(event) =>
           setState({ ...state, categoryFilter: event.target.value })

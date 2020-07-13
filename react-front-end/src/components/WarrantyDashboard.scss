@@ -1,0 +1,11 @@
+.warranty-dashboard {
+  width: 95%;
+  display: flex;
+  // justify-content: space-between;
+  align-items: center;
+  justify-content: space-between;
+
+  &-chart-container {
+    width: 700px;
+  }
+}

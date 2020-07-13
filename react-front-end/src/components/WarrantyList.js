@@ -13,12 +13,12 @@ export default function Warranties(props) {
     );
   });
   return (
-    <table>
+    <table className="list-with-progress">
       <thead>
         <tr>
-          <th>Category</th>
-          <th>Warranty name</th>
-          <th>Progress</th>
+          <th className="category">Category</th>
+          <th className="name">Warranty name</th>
+          <th className="progress">Progress</th>
         </tr>
       </thead>
       <tbody>{warrantyItems}</tbody>

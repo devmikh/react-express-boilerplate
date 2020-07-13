@@ -21,17 +21,16 @@ export default function WarrantyListItem(props) {
   }
   // console.log(monthDiff(day1, day2));
   // console.log(day2);
-  let passedMonths = monthDiff(day1, day2);
-  let status = [false, false, false, false];
+  let passedMonths = monthDiff(day1, day2) < 1 ? 1 : monthDiff(day1, day2);
+  let color = "grey";
   if (passedMonths / duration_in_months >= 1) {
-    status[3] = true;
     passedMonths = duration_in_months;
   } else if (passedMonths / duration_in_months > 0.75) {
-    status[0] = true;
+    color = "red";
   } else if (passedMonths / duration_in_months > 0.25) {
-    status[1] = true;
+    color = "yellow";
   } else {
-    status[2] = true;
+    color = "green";
   }
   let icon;
   switch (item_category) {
@@ -102,20 +101,27 @@ export default function WarrantyListItem(props) {
   }
   return (
     <tr>
-      <td>
-        <i className={icon} aria-hidden="true"></i>
+      <td className="list-icon-container">
+        <div className="list-icon-frame">
+          <i className={icon} aria-hidden="true"></i>
+        </div>
       </td>
       <td>{item_name}</td>
-      <td style={{ width: "600px" }}>
+      <td style={{ width: "100%" }}>
         {" "}
         <Progress
           value={passedMonths}
           total={duration_in_months}
           progress="ratio"
-          error={status[0]}
-          warning={status[1]}
-          success={status[2]}
-          disabled={status[3]}
+          // error={status[0]}
+          // warning={status[1]}
+          // success={status[2]}
+          // disabled={status[3]}
+          // indicating={true}
+          // indicating
+          color={color}
+          active
+          size="medium"
         />
       </td>
       <td>

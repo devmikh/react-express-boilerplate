@@ -5,6 +5,10 @@ import Payments from "./Payments";
 import Transactions from "./Transactions";
 import Form from "./Form";
 import ItemDetails from "./ItemDetails";
+import "./Search.scss";
+import "./Button.scss";
+import "./ListWithProgress.scss";
+import "./List.scss";
 
 export default function Tab(props) {
   if (props.state.currentItem === null) {
