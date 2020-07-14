@@ -24,15 +24,15 @@ export default function Transactions(props) {
   }, [props.transactions]);
 
   return (
-    <div>
+    <div className="tab">
       <TransactionDashboard transactions={state.transactions} />
-      <TransactionSearch state={state} setState={setState} />
-      {/* <CategoryFilter state={state} setState={setState} /> */}
-      {/* setCategoryFilter={setCategoryFilter} */}
-      {/* <TransactionOrderBy state={state} setState={setState} /> */}
+      <div className="search-filter-container">
+        <TransactionSearch state={state} setState={setState} />
+      </div>
 
-      <button onClick={(e) => props.setRenderForm(true)}>
+      <button className="button-add" onClick={(e) => props.setRenderForm(true)}>
         <i className="fa fa-plus" aria-hidden="true"></i>
+        <span>Add Item</span>
       </button>
       {/* <WarrantyList
         warranties={state.displayedWarranties}

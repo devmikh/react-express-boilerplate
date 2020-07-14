@@ -48,27 +48,25 @@ export default function FormTransactionList(props) {
     });
 
   return (
-    <div>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Name</th>
-            <th>Amount</th>
-            {setTransactions && <th>Action</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {setTransactions && (
-            <AddTransactionForm
-              transactions={transactions}
-              setTransactions={setTransactions}
-              setError={props.setError}
-            />
-          )}
-          {transactions.length > 0 && formTransactionListItems}
-        </tbody>
-      </table>
-    </div>
+    <table className="list">
+      <thead>
+        <tr>
+          <th className="date">Date</th>
+          <th className="name">Name</th>
+          <th className="amount">Amount</th>
+          {setTransactions && <th>Action</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {setTransactions && (
+          <AddTransactionForm
+            transactions={transactions}
+            setTransactions={setTransactions}
+            setError={props.setError}
+          />
+        )}
+        {transactions.length > 0 && formTransactionListItems}
+      </tbody>
+    </table>
   );
 }

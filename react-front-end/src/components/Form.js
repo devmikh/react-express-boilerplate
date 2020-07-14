@@ -137,18 +137,18 @@ export default function Form(props) {
 
   const categoryOptions = [
     "Other",
-    "Personal and Household", //
+    "Personal", //
     "Transportation",
-    "Grocery and Retail",
+    "Grocery",
     "Entertainment",
     "Restaurants",
-    "Health and Education",
-    "Sports Equipment",
+    "Health",
+    "Sports",
     "Mobile",
     "Appliance",
     "Electronics",
     "Camera",
-    "Musical Instruments",
+    //"Musical Instruments",
     "Audio",
   ].map((category, index) => {
     return <option key={index}>{category}</option>;

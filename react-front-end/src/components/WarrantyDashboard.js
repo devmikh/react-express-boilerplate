@@ -1,7 +1,7 @@
 import React from "react";
 import { VictoryPie, VictoryTheme } from "victory";
 import Card from "./Card";
-import "./WarrantyDashboard.scss";
+import "./Dashboard.scss";
 
 export default function WarrantyDashboard(props) {
   const { warranties } = props;
@@ -57,16 +57,16 @@ export default function WarrantyDashboard(props) {
   }).length;
 
   return (
-    <div className="warranty-dashboard">
-      <div className="warranty-dashboard-chart-container">
+    <div className="dashboard">
+      <div className="dashboard-chart-container">
         <VictoryPie
           data={data}
-          height={240}
+          height={260}
           style={{ width: "50%" }}
           theme={VictoryTheme.material}
         />
       </div>
-      <div className="column-1">
+      <div>
         <Card
           title="Total Warranties"
           total={warranties.length}
@@ -79,7 +79,7 @@ export default function WarrantyDashboard(props) {
           safe
         />
       </div>
-      <div className="column-2">
+      <div>
         <Card
           title="Total Caution"
           total={yellowWarranties}

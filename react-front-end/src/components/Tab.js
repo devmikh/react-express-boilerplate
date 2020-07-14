@@ -30,7 +30,7 @@ export default function Tab(props) {
             fetchItemDetails={props.fetchItemDetails}
           />
         );
-      case "Monthly Payments":
+      case "Payments":
         return (
           <Payments
             payments={props.state.payments}

@@ -1,0 +1,41 @@
+.dashboard {
+  width: 95%;
+  display: flex;
+  // justify-content: space-between;
+  align-items: center;
+  justify-content: flex-start;
+
+  &-chart-container {
+    width: 600px;
+    // height: 500px;
+  }
+  &-transactions {
+    margin-left: 40px;
+    display: flex;
+    width: 100%;
+    // flex-direction: column;
+    // justify-content: center;
+
+    tspan {
+      font-size: 20px !important;
+    }
+
+    &-first {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    &-second {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      // width: 80%;
+      // justify-content: flex-start;
+    }
+  }
+
+  // tspan {
+  //   font-size: 30px;
+  // }
+}

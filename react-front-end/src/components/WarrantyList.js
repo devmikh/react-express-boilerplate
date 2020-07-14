@@ -17,7 +17,7 @@ export default function Warranties(props) {
       <thead>
         <tr>
           <th className="category">Category</th>
-          <th className="name">Warranty name</th>
+          <th className="name">Name</th>
           <th className="progress">Progress</th>
         </tr>
       </thead>

@@ -7,20 +7,31 @@
   width: 360px;
   border-radius: 10px;
   padding: 20px;
-  margin: 10px;
+  margin: 50px;
   box-shadow: 1px 2px lightgrey;
   background-color: rgb(235, 233, 233);
   transition: all 200ms ease-out;
 
   .card-icon-container {
+    width: 100px;
+
+    text-align: center;
     background-color: grey;
     &-safe {
+      width: 100px;
+
+      text-align: center;
       background-color: rgb(84, 173, 88);
     }
     &-caution {
+      width: 100px;
+
+      text-align: center;
       background-color: rgb(253, 159, 26);
     }
     &-danger {
+      width: 100px;
+      text-align: center;
       background-color: rgb(234, 70, 66);
     }
   }

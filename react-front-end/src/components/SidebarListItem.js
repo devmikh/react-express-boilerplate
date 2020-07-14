@@ -23,7 +23,10 @@ export default function SidebarListItem(props) {
       className={dayClass}
       data-testid="day"
     >
-      <h2 className="text--regular">{props.name}</h2>
+      <h2 className="text--regular">
+        <i class={props.icon} aria-hidden="true"></i>
+        {` ${props.name}`}
+      </h2>
     </li>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
-import { VictoryPie } from "victory";
+import { VictoryPie, VictoryTheme } from "victory";
 import Card from "./Card";
+import "./Dashboard.scss";
 
 export default function PaymentDashboard(props) {
   const { payments, transactions } = props;
@@ -22,6 +23,12 @@ export default function PaymentDashboard(props) {
     data.push({ x: category, y: dataObj[category] });
   }
   // // Card logic
+  const formatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  });
+
   function monthDiff(d1, d2) {
     var months;
     months = (d2.getFullYear() - d1.getFullYear()) * 12;
@@ -72,72 +79,33 @@ export default function PaymentDashboard(props) {
 
     return total;
   }
-
-  // let fake = { start_date: "1586652092000", id: 1 };
-  // let fakeT = [
-  //   { date: "1586652091000", amount: 40, entry_id: 1 },
-  //   { date: "1586911292000", amount: 40, entry_id: 1 },
-  //   { date: "1591317692000", amount: 40, entry_id: 1 },
-  //   { date: "1593477692000", amount: 40, entry_id: 2 },
-  // ];
-  useEffect(() => {
-    // console.log(transactions);
-    // console.log(payments);
-    // console.log(currentMonthUnPaid(payments[1], transactions));
-    console.log(calculateTotalUnpaidForThisMonth());
-  }, [payments, transactions]);
-
-  // let greenWarranties = warranties.filter((warranty) => {
-  //   return (
-  //     monthDiffFromNow(warranty.start_date) / warranty.duration_in_months <=
-  //     0.25
-  //   );
-  // }).length;
-
-  // let yellowWarranties = warranties.filter((warranty) => {
-  //   return (
-  //     monthDiffFromNow(warranty.start_date) / warranty.duration_in_months <=
-  //       0.75 &&
-  //     monthDiffFromNow(warranty.start_date) / warranty.duration_in_months > 0.25
-  //   );
-  // }).length;
-
-  // let redWarranties = warranties.filter((warranty) => {
-  //   return (
-  //     monthDiffFromNow(warranty.start_date) / warranty.duration_in_months >=
-  //     0.75
-  //   );
-  // }).length;
+  // useEffect(() => {
+  //   // console.log(formatter.format(calculateTotalUnpaidForThisMonth()));
+  // }, [payments, transactions]);
 
   return (
-    <div style={{ width: "60%" }}>
-      <VictoryPie data={data} height={200} style={{ width: "50%" }} />
+    <div className="dashboard">
+      <div className="dashboard-chart-container">
+        <VictoryPie
+          data={data}
+          height={260}
+          style={{ width: "50%" }}
+          theme={VictoryTheme.material}
+        />
+      </div>
+
       <Card
         title="Total Payments"
         total={payments.length}
-        icon={"fa fa-file-text fa-5x"}
+        icon={"fa fa-credit-card fa-5x"}
       />
 
       <Card
         title="Total Unpaid This Month"
-        total={calculateTotalUnpaidForThisMonth()}
-        icon={"fa fa-file-text fa-5x"}
+        total={formatter.format(calculateTotalUnpaidForThisMonth())}
+        icon={"fa fa-usd fa-5x"}
+        caution
       />
-      {/* <Card
-        title="Total Safe"
-        total={greenWarranties}
-        icon={"fa fa-file-text fa-5x"}
-      />
-      <Card
-        title="Total Caution"
-        total={yellowWarranties}
-        icon={"fa fa-file-text fa-5x"}
-      />
-      <Card
-        title="Total Danger"
-        total={redWarranties}
-        icon={"fa fa-file-text fa-5x"}
-      /> */}
     </div>
   );
 }

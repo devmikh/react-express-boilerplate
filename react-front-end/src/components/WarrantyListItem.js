@@ -34,7 +34,8 @@ export default function WarrantyListItem(props) {
   }
   let icon;
   switch (item_category) {
-    case "Personal and Household":
+    //case "Personal and Household":
+    case "Personal":
       // code block
       icon = "fa fa-home";
       break;
@@ -42,7 +43,7 @@ export default function WarrantyListItem(props) {
       // code block
       icon = "fa fa-bus";
       break;
-    case "Grocery and Retail":
+    case "Grocery":
       // code block
       icon = "fa fa-shopping-cart";
       break;
@@ -57,19 +58,21 @@ export default function WarrantyListItem(props) {
       icon = "fa fa-cutlery";
       break;
 
-    case "Health and Education":
+    //case "Health and Education":
+    case "Health":
       // code block
       icon = "fa fa-hospital-o";
       break;
 
-    case "Sports Equipment":
+    //case "Sports Equipment":
+    case "Sports":
       // code block
       icon = "fa fa-bicycle";
       break;
 
     case "Mobile":
       // code block
-      icon = "fa fa-mobile";
+      icon = "fa fa-mobile fa-lg";
       break;
     case "Appliance":
       // code block
@@ -85,10 +88,10 @@ export default function WarrantyListItem(props) {
       icon = "fa fa-camera";
       break;
 
-    case "Musical Instruments":
-      // code block
-      icon = "fa fa-music";
-      break;
+    // case "Musical Instruments":
+    //   // code block
+    //   icon = "fa fa-music";
+    //   break;
 
     case "Audio":
       // code block
@@ -108,25 +111,21 @@ export default function WarrantyListItem(props) {
       </td>
       <td>{item_name}</td>
       <td style={{ width: "100%" }}>
-        {" "}
         <Progress
           value={passedMonths}
           total={duration_in_months}
           progress="ratio"
-          // error={status[0]}
-          // warning={status[1]}
-          // success={status[2]}
-          // disabled={status[3]}
-          // indicating={true}
-          // indicating
           color={color}
           active
           size="medium"
         />
       </td>
       <td>
-        <button onClick={(e) => props.fetchItemDetails(item_id, false)}>
-          <i className="fa fa-info-circle" aria-hidden="true"></i>
+        <button
+          className="button-info"
+          onClick={(e) => props.fetchItemDetails(item_id, false)}
+        >
+          <i className="fa fa-info" aria-hidden="true"></i>
         </button>
       </td>
     </tr>

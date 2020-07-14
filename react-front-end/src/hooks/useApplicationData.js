@@ -7,7 +7,7 @@ export default function useApplicationData() {
     // Initialize application state
     tab: "Warranties",
     userData: {},
-    tabs: ["Warranties", "Monthly Payments", "Transactions", "User Profile"],
+    tabs: ["Warranties", "Payments", "Transactions", "User Profile"],
     warranties: [],
     payments: [],
     transactions: [],

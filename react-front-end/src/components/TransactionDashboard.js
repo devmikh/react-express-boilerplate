@@ -1,5 +1,12 @@
 import React from "react";
-import { VictoryPie, VictoryChart, VictoryLine, VictoryTheme } from "victory";
+import {
+  VictoryPie,
+  VictoryChart,
+  VictoryLine,
+  VictoryTheme,
+  VictoryLabel,
+  VictoryAxis,
+} from "victory";
 import Card from "./Card";
 
 export default function TransactionDashboard(props) {
@@ -25,7 +32,7 @@ export default function TransactionDashboard(props) {
 
   const formatter = new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "CAD",
+    currency: "USD",
     minimumFractionDigits: 2,
   });
 
@@ -56,7 +63,6 @@ export default function TransactionDashboard(props) {
     });
     return total;
   }
-
   function fetchThisYearDataForGraph() {
     let months = [
       "Jan",
@@ -107,63 +113,50 @@ export default function TransactionDashboard(props) {
   //console.log(fetchAllYearsDataForGraph());
 
   return (
-    <div style={{ width: "60%" }}>
-      <VictoryChart theme={VictoryTheme.material}>
-        <VictoryLine
-          style={{
-            data: { stroke: "#c43a31" },
-            parent: { border: "1px solid #ccc" },
-          }}
-          data={fetchThisYearDataForGraph()}
+    <div className="dashboard-transactions">
+      <div className="dashboard-transactions-first">
+        <h2>Monthly Spend</h2>
+        <VictoryChart theme={VictoryTheme.material} height={400} width={600}>
+          <VictoryLine
+            style={{
+              data: { stroke: "#c43a31" },
+              parent: { border: "1px solid #ccc" },
+            }}
+            data={fetchThisYearDataForGraph()}
+          />
+        </VictoryChart>
+        <Card
+          title="Total Spent This Month"
+          total={formatter.format(
+            calculateTotalForMonth(
+              new Date().getMonth(),
+              new Date().getFullYear()
+            )
+          )}
+          icon={"fa fa-usd fa-5x"}
+          caution
         />
-      </VictoryChart>
-      <VictoryChart theme={VictoryTheme.material}>
-        <VictoryLine
-          style={{
-            data: { stroke: "#c43a31" },
-            parent: { border: "1px solid #ccc" },
-          }}
-          data={fetchAllYearsDataForGraph()}
+      </div>
+      <div className="dashboard-transactions-second">
+        <h2>Yearly Spend</h2>
+        <VictoryChart theme={VictoryTheme.material} height={400} width={600}>
+          <VictoryLine
+            style={{
+              data: { stroke: "#c43a31" },
+              parent: { border: "1px solid #ccc" },
+            }}
+            data={fetchAllYearsDataForGraph()}
+          />
+        </VictoryChart>
+        <Card
+          title="Total Spent This Year"
+          total={formatter.format(
+            calculateTotalForYear(new Date().getFullYear())
+          )}
+          icon={"fa fa-usd fa-5x"}
+          caution
         />
-      </VictoryChart>
-      <Card
-        title="Total Spent This Month"
-        total={formatter.format(
-          calculateTotalForMonth(
-            new Date().getMonth(),
-            new Date().getFullYear()
-          )
-        )}
-        icon={"fa fa-file-text fa-5x"}
-      />
-      <Card
-        title="Total Spent This Year"
-        total={formatter.format(
-          calculateTotalForYear(new Date().getFullYear())
-        )}
-        icon={"fa fa-file-text fa-5x"}
-      />
-      {/* <VictoryPie data={data} height={200} style={{ width: "50%" }} />
-      <Card
-        title="Total Warranties"
-        total={warranties.length}
-        icon={"fa fa-file-text fa-5x"}
-      /> */}
-      {/* <Card
-        title="Total Safe"
-        total={10}
-        icon={"fa fa-file-text fa-5x"}
-      />
-      <Card
-        title="Total Caution"
-        total={10}
-        icon={"fa fa-file-text fa-5x"}
-      />
-      <Card
-        title="Total Danger"
-        total={10}
-        icon={"fa fa-file-text fa-5x"}
-      /> */}
+      </div>
     </div>
   );
 }

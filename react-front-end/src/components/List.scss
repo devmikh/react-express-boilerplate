@@ -1,0 +1,27 @@
+.list {
+  width: 95%;
+  text-align: left;
+  font-size: large;
+
+  tr {
+    height: 60px;
+  }
+
+  th {
+    font-size: 30px;
+  }
+
+  td {
+    font-size: 28px;
+  }
+
+  .name {
+    width: 40%;
+  }
+  .date {
+    width: 30%;
+  }
+  .amount {
+    width: 20%;
+  }
+}

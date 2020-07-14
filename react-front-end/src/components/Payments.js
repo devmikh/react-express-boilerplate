@@ -39,28 +39,27 @@ export default function Payments(props) {
   }, [props.payments]);
   // console.log("Warranties.js rerender");
   return (
-    <div>
+    <div className="tab">
       <PaymentDashboard
         payments={props.payments}
         transactions={props.transactions}
       />
-      <PaymentSearch state={state} setState={setState} />
-      <PaymentCategoryFilter state={state} setState={setState} />
-      {/* setCategoryFilter={setCategoryFilter} */}
-      <PaymentOrderBy state={state} setState={setState} />
-
-      <button onClick={(e) => props.setRenderForm(true)}>
+      <div className="search-filter-container">
+        <PaymentSearch state={state} setState={setState} />
+        <div className="filter-container">
+          <PaymentCategoryFilter state={state} setState={setState} />
+          <PaymentOrderBy state={state} setState={setState} />
+        </div>
+      </div>
+      <button className="button-add" onClick={(e) => props.setRenderForm(true)}>
         <i className="fa fa-plus" aria-hidden="true"></i>
+        <span>Add Item</span>
       </button>
       <PaymentList
         payments={state.displayedPayments}
         setCurrentItem={props.setCurrentItem}
         fetchItemDetails={props.fetchItemDetails}
       />
-      {/* {warrantyItems} */}
-      {/* {props.warranties.map((warranty) => (
-        <WarrantyListItem warranty={warranty} />
-      ))} */}
     </div>
   );
 }

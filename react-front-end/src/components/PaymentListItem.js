@@ -21,14 +21,11 @@ export default function PaymentListItem(props) {
   }
   // console.log(monthDiff(day1, day2));
   // console.log(day2);
-  let passedMonths = monthDiff(day1, day2);
-  let status = [false, false, false];
-  if (passedMonths / duration_in_months > 0.75) {
-    status[0] = true;
-  } else if (passedMonths / duration_in_months > 0.25) {
-    status[1] = true;
-  } else {
-    status[2] = true;
+  let passedMonths = monthDiff(day1, day2) < 1 ? 1 : monthDiff(day1, day2);
+  let color = "green";
+  if (passedMonths / duration_in_months >= 1) {
+    passedMonths = duration_in_months;
+    color = "grey";
   }
   let icon;
   switch (item_category) {
@@ -67,7 +64,7 @@ export default function PaymentListItem(props) {
 
     case "Mobile":
       // code block
-      icon = "fa fa-mobile";
+      icon = "fa fa-mobile fa-lg";
       break;
     case "Appliance":
       // code block
@@ -99,24 +96,28 @@ export default function PaymentListItem(props) {
   }
   return (
     <tr>
-      <td>
-        <i className={icon} aria-hidden="true"></i>
+      <td className="list-icon-container">
+        <div className="list-icon-frame">
+          <i className={icon} aria-hidden="true"></i>
+        </div>
       </td>
       <td>{item_name}</td>
-      <td style={{ width: "600px" }}>
-        {" "}
+      <td style={{ width: "100%" }}>
         <Progress
           value={passedMonths}
           total={duration_in_months}
           progress="ratio"
-          error={status[0]}
-          warning={status[1]}
-          success={status[2]}
+          color={color}
+          active
+          size="medium"
         />
       </td>
       <td>
-        <button onClick={(e) => props.fetchItemDetails(item_id, false)}>
-          <i className="fa fa-info-circle" aria-hidden="true"></i>
+        <button
+          className="button-info"
+          onClick={(e) => props.fetchItemDetails(item_id, false)}
+        >
+          <i className="fa fa-info" aria-hidden="true"></i>
         </button>
       </td>
     </tr>

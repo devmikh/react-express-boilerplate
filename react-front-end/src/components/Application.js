@@ -3,6 +3,7 @@ import "./Application.scss";
 import useApplicationData from "../hooks/useApplicationData";
 import SidebarList from "./SidebarList";
 import Tab from "./Tab";
+import * as image from "../images/logo.png";
 
 export default function Application(props) {
   // Destructing custom hook
@@ -22,7 +23,10 @@ export default function Application(props) {
   return (
     <main className="layout">
       <section className="sidebar">
-        <h1 className="sidebar__lhl sidebar--centered">Warden</h1>
+        <h1 className="sidebar__logo sidebar--centered">
+          <img src={image} className="sidebar__logo-image" />
+          Warden
+        </h1>
         <hr className="sidebar__separator sidebar--centered" />
         <nav className="sidebar__menu">
           <SidebarList
@@ -33,7 +37,7 @@ export default function Application(props) {
           />
         </nav>
       </section>
-      <section className="schedule">
+      <section className="content">
         <Tab
           name={state.tab}
           state={state}

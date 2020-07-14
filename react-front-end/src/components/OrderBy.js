@@ -56,10 +56,10 @@ export default function OrderBy(props) {
       case "Oldest":
         sorted = state.displayedWarranties.sort(compareDateOldest);
         break;
-      case `Months left ↑`:
+      case `Months left 🠝`:
         sorted = state.displayedWarranties.sort(compareMonthsLeftSmallest);
         break;
-      case `Months left ↓`:
+      case `Months left 🠟`:
         sorted = state.displayedWarranties.sort(compareMonthsLeftLargest);
         break;
       default:
@@ -83,8 +83,8 @@ export default function OrderBy(props) {
       >
         <option> Newest </option>
         <option> Oldest </option>
-        <option> Months left ↑</option>
-        <option> Months left ↓</option>
+        <option>Months left 🠝</option>
+        <option> Months left 🠟</option>
       </select>
     </div>
   );
