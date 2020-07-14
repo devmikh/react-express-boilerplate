@@ -26,6 +26,18 @@
   margin-left: 2em;
 }
 
+.button-close {
+  color: white;
+  background-color: rgb(234, 70, 66);
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  padding: 10px;
+  width: 40px;
+  align-self: flex-start;
+  // margin-left: 40px;
+}
+
 button:focus {
   outline: none;
 }

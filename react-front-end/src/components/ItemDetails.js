@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import DownloadFileList from "./DownloadFileList";
 import FormTransactionList from "./FormTransactionList";
+import "./ItemDetails.scss";
 
 export default function ItemDetails(props) {
   const { currentItem, setCurrentItem } = props;
@@ -17,22 +18,40 @@ export default function ItemDetails(props) {
     ].join("-");
   }
   return (
-    <div>
-      <button onClick={(e) => props.setCurrentItem(null)}>
-        <i className="fa fa-times" aria-hidden="true"></i>
-      </button>
-      <button onClick={(e) => props.setRenderEditForm(true)}>
-        <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
-      </button>
+    <div className="item-details-container">
+      <div className="button-section">
+        <button
+          onClick={(e) => props.setCurrentItem(null)}
+          className="button-close"
+        >
+          <i className="fa fa-times" aria-hidden="true"></i>
+        </button>
+        <button
+          onClick={(e) => props.setRenderEditForm(true)}
+          className="button-add"
+        >
+          <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
+          <span>Edit</span>
+        </button>
+      </div>
+
       {/* Item */}
-      <div style={{ border: "2px solid black" }}>
-        <h2>{item.name}</h2>
-        <h2>{item.category}</h2>
-        <h2>{item.description}</h2>
+
+      <div className="item-section">
+        <div className="name-category-container">
+          <h2>{item.name}</h2>
+          <h2>Category: {item.category}</h2>
+        </div>
+        <div className="description">
+          <h2>Description:</h2>
+          <p className="description-text">
+            {item.description ? item.description : "N/A"}
+          </p>
+        </div>
       </div>
       {/* Warranty */}
       {currentItem.warranty && (
-        <div style={{ border: "2px solid black" }}>
+        <div className="warranty-section">
           <h1>Warranty</h1>
           <p>
             {formatDate(
@@ -46,7 +65,7 @@ export default function ItemDetails(props) {
       )}
       {/* Payment */}
       {currentItem.payment && (
-        <div style={{ border: "2px solid black" }}>
+        <div className="payment-section">
           <h1>Payment</h1>
           <p>
             {formatDate(new Date(parseInt(currentItem.payment.start_date, 10)))}
@@ -62,7 +81,7 @@ export default function ItemDetails(props) {
       )}
       {/* TransactionList */}
       {currentItem.transactions.length > 0 && (
-        <div style={{ border: "2px solid black" }}>
+        <div className="transaction-section">
           <h1>Transactions</h1>
           <FormTransactionList transactions={currentItem.transactions} />
         </div>
@@ -70,7 +89,7 @@ export default function ItemDetails(props) {
 
       {/* FileList */}
       {filesDB.length > 0 && (
-        <div style={{ border: "2px solid black" }}>
+        <div className="file-section">
           <h1>Files</h1>
           <DownloadFileList filesDB={filesDB} />
         </div>
