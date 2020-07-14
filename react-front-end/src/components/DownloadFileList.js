@@ -14,7 +14,7 @@ export default function DownloadFileList(props) {
 
   return (
     <div>
-      <p>Files</p>
+      {/* <p>Files</p> */}
       {downloadFileListItems}
     </div>
   );

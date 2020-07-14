@@ -38,6 +38,7 @@ export default function ItemDetails(props) {
       {/* Item */}
 
       <div className="item-section">
+        <h1>Basic Info</h1>
         <div className="name-category-container">
           <h2>{item.name}</h2>
           <h2>Category: {item.category}</h2>
@@ -51,32 +52,82 @@ export default function ItemDetails(props) {
       </div>
       {/* Warranty */}
       {currentItem.warranty && (
-        <div className="warranty-section">
+        <div className="entry-section">
           <h1>Warranty</h1>
+          <div className="entry-date-container">
+            <span>Start Date:</span>
+            <br />
+            <br />
+            <span>
+              {formatDate(
+                new Date(parseInt(currentItem.warranty.start_date, 10))
+              )}
+            </span>
+          </div>
+          <div>
+            <span>Duration in Months:</span>
+            <br />
+            <p>{currentItem.warranty.duration_in_months}</p>
+          </div>
+
           <p>
-            {formatDate(
-              new Date(parseInt(currentItem.warranty.start_date, 10))
-            )}
+            Notify by sms: <br /> {currentItem.warranty.sms ? "✔" : "❌"}
           </p>
-          <p>{currentItem.warranty.duration_in_months}</p>
-          <p>Notify by sms: {currentItem.warranty.sms ? "Yes" : "No"}</p>
-          <p>Notify by email: {currentItem.warranty.email ? "Yes" : "No"}</p>
+          <p>
+            Notify by email: <br /> {currentItem.warranty.email ? "✔" : "❌"}
+          </p>
+          {(currentItem.warranty.sms || currentItem.warranty.email) && (
+            <p>
+              Notify days prior to: <br /> {currentItem.warranty.days_prior}
+            </p>
+          )}
         </div>
       )}
       {/* Payment */}
       {currentItem.payment && (
-        <div className="payment-section">
+        <div className="entry-section">
           <h1>Payment</h1>
+          <div className="entry-date-container">
+            <span>Start Date:</span>
+            <br />
+            <br />
+            <span>
+              {formatDate(
+                new Date(parseInt(currentItem.payment.start_date, 10))
+              )}
+            </span>
+          </div>
+          <div>
+            <p>
+              {currentItem.payment.duration_in_months !== 0 ? (
+                <span>
+                  Duration in Months:
+                  <br />
+                  {currentItem.payment.duration_in_months}
+                </span>
+              ) : (
+                <p>One-Time Payment</p>
+              )}
+              {/* {currentItem.payment.duration_in_months === 0
+                ? "One-Time Payment"
+                :
+               
+                 currentItem.payment.duration_in_months} */}
+            </p>
+          </div>
+
           <p>
-            {formatDate(new Date(parseInt(currentItem.payment.start_date, 10)))}
+            Notify by sms: <br />
+            {currentItem.payment.sms ? "✔" : "❌"}
           </p>
           <p>
-            {currentItem.payment.duration_in_months === 0
-              ? "One-Time"
-              : currentItem.payment.duration_in_months}
+            Notify by email: <br /> {currentItem.payment.email ? "✔" : "❌"}
           </p>
-          <p>Notify by sms: {currentItem.payment.sms ? "Yes" : "No"}</p>
-          <p>Notify by email: {currentItem.payment.email ? "Yes" : "No"}</p>
+          {(currentItem.payment.sms || currentItem.payment.email) && (
+            <p>
+              Notify days prior to: <br /> {currentItem.payment.days_prior}
+            </p>
+          )}
         </div>
       )}
       {/* TransactionList */}

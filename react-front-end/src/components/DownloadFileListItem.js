@@ -4,10 +4,9 @@ export default function DownloadFileListItem(props) {
   const { id, name } = props;
 
   return (
-    <div>
+    <div className="file-link-container">
       <a href={`http://localhost:8080/api/files/${id}`} download>
-        {name}
-        <i className="fa fa-download" aria-hidden="true"></i>
+        {name} <i className="fa fa-download" aria-hidden="true"></i>
       </a>
     </div>
   );
