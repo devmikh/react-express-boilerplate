@@ -6,6 +6,7 @@ import {
   VictoryTheme,
   VictoryLabel,
   VictoryAxis,
+  VictoryBar,
 } from "victory";
 import Card from "./Card";
 
@@ -100,7 +101,10 @@ export default function TransactionDashboard(props) {
     years.sort((a, b) => a - b);
     // let data = [];
     const data = years.map((year) => {
-      return { x: year.toString(), y: calculateTotalForYear(year) };
+      return {
+        x: year.toString(),
+        y: calculateTotalForYear(year),
+      };
     });
     // for (let month = 2015; month <= 11; month++) {
     //   data.push({
@@ -108,6 +112,7 @@ export default function TransactionDashboard(props) {
     //     y: calculateTotalForMonth(month, new Date().getFullYear()),
     //   });
     // }
+    //data.push({ x: "2021", y: 0 });
     return data;
   }
   //console.log(fetchAllYearsDataForGraph());
@@ -116,14 +121,28 @@ export default function TransactionDashboard(props) {
     <div className="dashboard-transactions">
       <div className="dashboard-transactions-first">
         <h2>Monthly Spend</h2>
-        <VictoryChart theme={VictoryTheme.material} height={400} width={600}>
-          <VictoryLine
+        <VictoryChart
+          theme={VictoryTheme.material}
+          height={400}
+          width={600}
+          domainPadding={30}
+        >
+          {/* <VictoryLine
             style={{
               data: { stroke: "#c43a31" },
               parent: { border: "1px solid #ccc" },
             }}
             data={fetchThisYearDataForGraph()}
+
+          /> */}
+          <VictoryBar
+            data={fetchThisYearDataForGraph()}
+            style={{
+              data: { fill: "#c43a31" },
+            }}
           />
+          {/* <VictoryAxis />
+          <VictoryAxis dependentAxis /> */}
         </VictoryChart>
         <Card
           title="Total Spent This Month"
@@ -139,12 +158,21 @@ export default function TransactionDashboard(props) {
       </div>
       <div className="dashboard-transactions-second">
         <h2>Yearly Spend</h2>
-        <VictoryChart theme={VictoryTheme.material} height={400} width={600}>
-          <VictoryLine
+        <VictoryChart
+          theme={VictoryTheme.material}
+          height={400}
+          width={600}
+          domainPadding={30}
+        >
+          {/* <VictoryLine
             style={{
               data: { stroke: "#c43a31" },
               parent: { border: "1px solid #ccc" },
             }}
+            data={fetchAllYearsDataForGraph()}
+          /> */}
+          <VictoryBar
+            style={{ data: { fill: "#c43a31" } }}
             data={fetchAllYearsDataForGraph()}
           />
         </VictoryChart>
