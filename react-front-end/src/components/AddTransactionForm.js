@@ -67,16 +67,20 @@ export default function AddTransactionForm(props) {
   if (addMode) {
     return (
       <tr>
-        <i
-          class="fa fa-plus-circle"
-          aria-hidden="true"
-          onClick={(e) => setState({ ...state, addMode: false })}
-        ></i>
+        <td></td>
+        <td>
+          <i
+            style={{ marginLeft: "50%" }}
+            class="fa fa-plus-circle fa-3x"
+            aria-hidden="true"
+            onClick={(e) => setState({ ...state, addMode: false })}
+          ></i>
+        </td>
       </tr>
     );
   } else {
     return (
-      <tr>
+      <tr className="add-transaction-form">
         <td>
           <input
             type="date"
@@ -105,6 +109,7 @@ export default function AddTransactionForm(props) {
           />
         </td>
         <td>
+          &nbsp;&nbsp;&nbsp;&nbsp;
           <i
             class="fa fa-plus"
             aria-hidden="true"

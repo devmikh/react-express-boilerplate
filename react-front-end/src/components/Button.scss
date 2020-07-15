@@ -37,6 +37,30 @@
   align-self: flex-start;
   // margin-left: 40px;
 }
+.button-upload {
+  color: white;
+  background-color: rgb(70, 70, 248);
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  padding: 10px;
+  width: 130px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.button-delete-file {
+  color: white;
+  background-color: rgb(234, 70, 66);
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  padding: 10px;
+  width: 40px;
+  // margin: auto;
+  margin-left: 20px;
+  // align-self: flex-start;
+}
 
 button:focus {
   outline: none;

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import FileList from "./FileList";
 import FormTransactionList from "./FormTransactionList";
+import "./Form.scss";
 
 export default function Form(props) {
   const { addItem, setCurrentItem, deleteFile } = props;
@@ -275,201 +276,296 @@ export default function Form(props) {
   }
 
   return (
-    <div>
-      <button onClick={(e) => props.setRenderForm(false)}>
-        <i className="fa fa-times" aria-hidden="true"></i>
-      </button>
+    <div className="form-container">
+      <div className="button-section">
+        <button
+          onClick={(e) => props.setRenderForm(false)}
+          className="button-close"
+        >
+          <i className="fa fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+
       <form autoComplete="off" onSubmit={(event) => event.preventDefault()}>
         {/* Item section */}
-        <label>Name:</label>
-        <input
-          type="text"
-          value={itemName}
-          onChange={(event) => setItemName(event.target.value)}
-          placeholder="Enter Item Name"
-          required
-        ></input>
-        <label>Category: </label>
-        <select
-          value={itemCategory}
-          onChange={(event) => setItemCategory(event.target.value)}
-        >
-          {categoryOptions}
-        </select>
-        <label>Description:</label>
-        <input
-          type="text"
-          value={itemDescription}
-          onChange={(event) => setItemDescription(event.target.value)}
-          placeholder="Enter Description"
-        ></input>
-
+        <div className="item-section">
+          <h1>Basic Info</h1>
+          <div>
+            <label>Name:</label>
+            <br />
+            <br />
+            <input
+              type="text"
+              value={itemName}
+              onChange={(event) => setItemName(event.target.value)}
+              placeholder="Enter Item Name"
+              required
+            />
+          </div>
+          <div>
+            <label>Category: </label>
+            <br />
+            <br />
+            <select
+              className="select-css"
+              value={itemCategory}
+              onChange={(event) => setItemCategory(event.target.value)}
+            >
+              {categoryOptions}
+            </select>
+          </div>
+          <div>
+            <label>Description:</label>
+            <br />
+            <br />
+            <textarea
+              // type="text"
+              value={itemDescription}
+              onChange={(event) => setItemDescription(event.target.value)}
+              placeholder="Enter Description"
+              rows="4"
+              cols="50"
+            ></textarea>
+          </div>
+        </div>
         {/* Warranty section */}
-        <input
-          type="checkbox"
-          name="warrantyCheckBox"
-          checked={warrantySectionActive}
-          onChange={(event) =>
-            onSectionActiveChange(event.target.checked, "warranty")
-          }
-          required={!warrantySectionActive && !paymentSectionActive}
-          onInvalid={(e) =>
-            e.target.setCustomValidity("Please tick either warranty or payment")
-          }
-          onClick={(e) => e.target.setCustomValidity("")}
-        ></input>
-        <fieldset disabled={!warrantySectionActive}>
-          <h3>Warranty</h3>
-          <label>Start Date:</label>
-          <input
-            type="date"
-            value={warrantyStartDate}
-            onChange={(event) => setWarrantyStartDate(event.target.value)}
-            required={warrantySectionActive}
-          />
-          <label>Duration in months:</label>
-          <input
-            type="number"
-            value={warrantyDuration}
-            onChange={(event) => setWarrantyDuration(event.target.value)}
-            required={warrantySectionActive}
-          />
-          <label>Notifications</label>
-          <label>SMS: </label>
+        <div className="entry-section">
           <input
             type="checkbox"
-            name="smsCheckBox"
-            checked={warrantySmsNotification}
+            name="warrantyCheckBox"
+            checked={warrantySectionActive}
             onChange={(event) =>
-              onNotificationChange(
-                event.target.checked,
-                warrantyEmailNotification,
-                setWarrantySmsNotification,
-                "warranty"
+              onSectionActiveChange(event.target.checked, "warranty")
+            }
+            required={!warrantySectionActive && !paymentSectionActive}
+            onInvalid={(e) =>
+              e.target.setCustomValidity(
+                "Please tick either warranty or payment"
               )
             }
-          />
-          <label>E-mail: </label>
-          <input
-            type="checkbox"
-            name="emailCheckBox"
-            checked={warrantyEmailNotification}
-            onChange={(event) =>
-              onNotificationChange(
-                event.target.checked,
-                warrantySmsNotification,
-                setWarrantyEmailNotification,
-                "warranty"
-              )
-            }
-          />
-          <input
-            type="number"
-            value={warrantyNotifyDaysPrior}
-            onChange={(event) => setWarrantyNotifyDaysPrior(event.target.value)}
-            disabled={!warrantySmsNotification && !warrantyEmailNotification}
-            required={warrantySmsNotification || warrantyEmailNotification}
-          />
-        </fieldset>
+            onClick={(e) => e.target.setCustomValidity("")}
+          ></input>
+          <fieldset disabled={!warrantySectionActive}>
+            <h1>Warranty</h1>
+            <div>
+              <label>Start Date:</label>
+              <br />
+              <br />
+              <input
+                type="date"
+                value={warrantyStartDate}
+                onChange={(event) => setWarrantyStartDate(event.target.value)}
+                required={warrantySectionActive}
+              />
+            </div>
+
+            <div>
+              <label>Duration in months:</label>
+              <br />
+              <br />
+              <input
+                type="number"
+                value={warrantyDuration}
+                onChange={(event) => setWarrantyDuration(event.target.value)}
+                required={warrantySectionActive}
+              />
+            </div>
+            <div>
+              <label>Notify by SMS: </label> &nbsp;&nbsp;
+              <input
+                type="checkbox"
+                name="smsCheckBox"
+                checked={warrantySmsNotification}
+                onChange={(event) =>
+                  onNotificationChange(
+                    event.target.checked,
+                    warrantyEmailNotification,
+                    setWarrantySmsNotification,
+                    "warranty"
+                  )
+                }
+              />
+            </div>
+
+            <div>
+              <label>Notify by E-mail: </label> &nbsp;&nbsp;
+              <input
+                type="checkbox"
+                name="emailCheckBox"
+                checked={warrantyEmailNotification}
+                onChange={(event) =>
+                  onNotificationChange(
+                    event.target.checked,
+                    warrantySmsNotification,
+                    setWarrantyEmailNotification,
+                    "warranty"
+                  )
+                }
+              />
+            </div>
+
+            <div>
+              <label>Notify days prior to:</label>
+              <br />
+              <br />
+              <input
+                type="number"
+                value={warrantyNotifyDaysPrior}
+                onChange={(event) =>
+                  setWarrantyNotifyDaysPrior(event.target.value)
+                }
+                disabled={
+                  !warrantySmsNotification && !warrantyEmailNotification
+                }
+                required={warrantySmsNotification || warrantyEmailNotification}
+              />
+            </div>
+          </fieldset>
+        </div>
 
         {/* Payment section */}
-        <input
-          type="checkbox"
-          name="paymentCheckBox"
-          checked={paymentSectionActive}
-          onChange={(event) =>
-            onSectionActiveChange(event.target.checked, "payment")
-          }
-          required={!warrantySectionActive && !paymentSectionActive}
-        />
-        <fieldset disabled={!paymentSectionActive}>
-          <h3>Payment</h3>
+        <div className="entry-section">
           <input
-            type="radio"
-            checked={!paymentMonthly}
-            onChange={(event) => onPaymentMonthlyChange(!event.target.checked)}
+            type="checkbox"
+            name="paymentCheckBox"
+            checked={paymentSectionActive}
+            onChange={(event) =>
+              onSectionActiveChange(event.target.checked, "payment")
+            }
+            required={!warrantySectionActive && !paymentSectionActive}
           />
-          <label>One-time</label>
-          <input
-            type="radio"
-            checked={paymentMonthly}
-            onChange={(event) => onPaymentMonthlyChange(event.target.checked)}
-          />
-          <label>Monthly</label>
+          <fieldset disabled={!paymentSectionActive}>
+            <h1>Payment</h1>
+            <div>
+              <input
+                type="radio"
+                checked={!paymentMonthly}
+                onChange={(event) =>
+                  onPaymentMonthlyChange(!event.target.checked)
+                }
+              />
+              <label>One-time </label>
+              <input
+                type="radio"
+                checked={paymentMonthly}
+                onChange={(event) =>
+                  onPaymentMonthlyChange(event.target.checked)
+                }
+              />
+              <label>Monthly</label>
+            </div>
+            <div>
+              <label>{paymentMonthly ? "Start Date" : "Date"}</label>
+              <br />
+              <br />
+              <input
+                type="date"
+                value={paymentStartDate}
+                onChange={(event) => setPaymentStartDate(event.target.value)}
+                required={paymentSectionActive}
+              />
+            </div>
 
-          <label>{paymentMonthly ? "Start Date" : "Date"}</label>
-          <input
-            type="date"
-            value={paymentStartDate}
-            onChange={(event) => setPaymentStartDate(event.target.value)}
-            required={paymentSectionActive}
+            <div>
+              <label>Duration in months:</label>
+              <br />
+              <br />
+              <input
+                type="number"
+                value={paymentDuration}
+                onChange={(event) => setPaymentDuration(event.target.value)}
+                required={paymentMonthly}
+                disabled={!paymentMonthly}
+              />
+            </div>
+
+            <div>
+              <label>Notify by SMS: </label> &nbsp;&nbsp;
+              <input
+                type="checkbox"
+                name="smsCheckBox"
+                checked={paymentSmsNotification}
+                onChange={(event) =>
+                  onNotificationChange(
+                    event.target.checked,
+                    paymentEmailNotification,
+                    setPaymentSmsNotification,
+                    "payment"
+                  )
+                }
+                disabled={!paymentMonthly}
+              />
+            </div>
+
+            <div>
+              <label>Notify by E-mail: </label> &nbsp;&nbsp;
+              <input
+                type="checkbox"
+                name="emailCheckBox"
+                checked={paymentEmailNotification}
+                onChange={(event) =>
+                  onNotificationChange(
+                    event.target.checked,
+                    paymentSmsNotification,
+                    setPaymentEmailNotification,
+                    "payment"
+                  )
+                }
+                disabled={!paymentMonthly}
+              />
+            </div>
+
+            <div>
+              <label>Notify days prior to:</label>
+              <br />
+              <br />
+              <input
+                type="number"
+                value={paymentNotifyDaysPrior}
+                onChange={(event) =>
+                  setPaymentNotifyDaysPrior(event.target.value)
+                }
+                disabled={!paymentSmsNotification && !paymentEmailNotification}
+                required={paymentSmsNotification || paymentEmailNotification}
+              />
+            </div>
+          </fieldset>
+        </div>
+
+        <div>
+          <h1>Transactions</h1>
+          <p>{error}</p>
+          <FormTransactionList
+            transactions={transactions}
+            setTransactions={setTransactions}
+            setError={setError}
           />
-          <label>Duration in months:</label>
-          <input
-            type="number"
-            value={paymentDuration}
-            onChange={(event) => setPaymentDuration(event.target.value)}
-            required={paymentMonthly}
-            disabled={!paymentMonthly}
+        </div>
+
+        <div className="file-section">
+          <h1>Files</h1>
+          <FileList
+            currentItem={currentItem}
+            setCurrentItem={setCurrentItem}
+            files={files}
+            deleteFile={deleteFile}
           />
-          <label>Notifications</label>
-          <label>SMS: </label>
+
+          <label for="files" className="button-upload">
+            <i class="fa fa-file"></i>&nbsp;&nbsp;Add Files
+          </label>
+
           <input
-            type="checkbox"
-            name="smsCheckBox"
-            checked={paymentSmsNotification}
-            onChange={(event) =>
-              onNotificationChange(
-                event.target.checked,
-                paymentEmailNotification,
-                setPaymentSmsNotification,
-                "payment"
-              )
-            }
-            disabled={!paymentMonthly}
+            id="files"
+            type="file"
+            files={files}
+            multiple
+            onChange={(event) => setFiles(event.target.files)}
           />
-          <label>E-mail: </label>
-          <input
-            type="checkbox"
-            name="emailCheckBox"
-            checked={paymentEmailNotification}
-            onChange={(event) =>
-              onNotificationChange(
-                event.target.checked,
-                paymentSmsNotification,
-                setPaymentEmailNotification,
-                "payment"
-              )
-            }
-            disabled={!paymentMonthly}
-          />
-          <input
-            type="number"
-            value={paymentNotifyDaysPrior}
-            onChange={(event) => setPaymentNotifyDaysPrior(event.target.value)}
-            disabled={!paymentSmsNotification && !paymentEmailNotification}
-            required={paymentSmsNotification || paymentEmailNotification}
-          />
-        </fieldset>
-        <p>{error}</p>
-        <FormTransactionList
-          transactions={transactions}
-          setTransactions={setTransactions}
-          setError={setError}
-        />
-        <FileList
-          currentItem={currentItem}
-          setCurrentItem={setCurrentItem}
-          files={files}
-          deleteFile={deleteFile}
-        />
+        </div>
+
         <input
-          type="file"
-          files={files}
-          multiple
-          onChange={(event) => setFiles(event.target.files)}
-        />
-        <input
+          className="save-section"
           type="submit"
           onClick={validate}
           value={currentItem ? "Update" : "Save"}
