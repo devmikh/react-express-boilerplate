@@ -29,7 +29,7 @@ export default function FormTransactionList(props) {
 
     setTransactions(
       transactions.filter((transaction) => {
-        return transaction.name !== name && transaction.amount !== amount;
+        return transaction.name !== name || transaction.amount !== amount;
       })
     );
   }

@@ -43,10 +43,30 @@ export default function PaymentDashboard(props) {
     const year = new Date().getFullYear();
     const month = new Date().getMonth();
     const day = new Date(parseInt(payment.start_date, 10)).getDate();
-    const previousMonthDueDate = new Date(
-      `${year}-${month === 0 ? 12 : month}-${day}`
+    // Fix date later on
+    const dueDate = new Date(
+      new Date().getDate() < day
+        ? `${year}-${month + 1}-${day}`
+        : `${year}-${month + 2}-${day}`
     );
-    console.log("previousMonthDueDate: ", previousMonthDueDate);
+    const previousMonthDueDate = addMonths(dueDate, -1);
+    // new Date(
+    //   `${year}-${month === 0 ? 12 : month}-${day}`
+    // );
+    // console.log("previousMonthDueDate: ", previousMonthDueDate);
+    // transactionDate > previousDueDate &&
+    console.log("dueDate", dueDate);
+    console.log("previous dueDate", previousMonthDueDate);
+
+    function addMonths(date, months) {
+      var d = date.getDate();
+      let dateCopy = new Date(date.getTime());
+      dateCopy.setMonth(date.getMonth() + +months);
+      if (date.getDate() != d) {
+        dateCopy.setDate(0);
+      }
+      return dateCopy;
+    }
 
     const transactionsBelongToPayment = transactions.filter((transaction) => {
       return transaction.entry_id === payment.id;
@@ -55,7 +75,10 @@ export default function PaymentDashboard(props) {
 
     const transactionPaidForThisMonth = transactionsBelongToPayment.filter(
       (transaction) => {
-        return new Date(parseInt(transaction.date, 10)) > previousMonthDueDate;
+        return (
+          new Date(parseInt(transaction.date, 10)) > previousMonthDueDate &&
+          new Date(parseInt(transaction.date, 10)) <= dueDate
+        );
       }
     );
     console.log("Transation paid for this month", transactionPaidForThisMonth);
