@@ -91,8 +91,8 @@ function formatDate(date) {
 let paymentNotificationLog = {};
 
 setInterval(async () => {
-  // handleWarrantyNotifications();
-  // handlePaymentNotifications();
+  handleWarrantyNotifications();
+  handlePaymentNotifications();
 }, 10000);
 
 // handlePaymentNotifications();
@@ -238,14 +238,14 @@ function handleWarrantyNotifications() {
                 console.log("Email sent: " + info.response);
               }
             });
-
-            db.query(
-              `
-              UPDATE entries SET days_prior = 0 WHERE id = $1;
-            `,
-              [warranty.id]
-            );
+            //
           }
+          db.query(
+            `
+            UPDATE entries SET days_prior = 0 WHERE id = $1;
+          `,
+            [warranty.id]
+          );
         }
       }
     });

@@ -58,7 +58,7 @@ export default function PaymentDashboard(props) {
         return new Date(parseInt(transaction.date, 10)) > previousMonthDueDate;
       }
     );
-    console.log(transactionPaidForThisMonth);
+    console.log("Transation paid for this month", transactionPaidForThisMonth);
 
     let unpaid = 0;
     if (

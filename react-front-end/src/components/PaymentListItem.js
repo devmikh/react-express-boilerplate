@@ -29,7 +29,8 @@ export default function PaymentListItem(props) {
   }
   let icon;
   switch (item_category) {
-    case "Personal and Household":
+    //case "Personal and Household":
+    case "Personal":
       // code block
       icon = "fa fa-home";
       break;
@@ -37,7 +38,7 @@ export default function PaymentListItem(props) {
       // code block
       icon = "fa fa-bus";
       break;
-    case "Grocery and Retail":
+    case "Grocery":
       // code block
       icon = "fa fa-shopping-cart";
       break;
@@ -52,12 +53,14 @@ export default function PaymentListItem(props) {
       icon = "fa fa-cutlery";
       break;
 
-    case "Health and Education":
+    //case "Health and Education":
+    case "Health":
       // code block
       icon = "fa fa-hospital-o";
       break;
 
-    case "Sports Equipment":
+    //case "Sports Equipment":
+    case "Sports":
       // code block
       icon = "fa fa-bicycle";
       break;
@@ -80,10 +83,10 @@ export default function PaymentListItem(props) {
       icon = "fa fa-camera";
       break;
 
-    case "Musical Instruments":
-      // code block
-      icon = "fa fa-music";
-      break;
+    // case "Musical Instruments":
+    //   // code block
+    //   icon = "fa fa-music";
+    //   break;
 
     case "Audio":
       // code block

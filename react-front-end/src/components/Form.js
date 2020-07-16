@@ -286,7 +286,7 @@ export default function Form(props) {
         </button>
       </div>
 
-      <form autoComplete="off" onSubmit={(event) => event.preventDefault()}>
+      <form onSubmit={(event) => event.preventDefault()}>
         {/* Item section */}
         <div className="item-section">
           <h1>Basic Info</h1>
