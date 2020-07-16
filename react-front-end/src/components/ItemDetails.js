@@ -88,7 +88,11 @@ export default function ItemDetails(props) {
         <div className="entry-section">
           <h1>Payment</h1>
           <div className="entry-date-container">
-            <span>Start Date:</span>
+            <span>
+              {currentItem.payment.duration_in_months
+                ? "First Due Date:"
+                : "Date:"}
+            </span>
             <br />
             <br />
             <span>

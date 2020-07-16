@@ -124,7 +124,7 @@ export default function PaymentDashboard(props) {
       />
 
       <Card
-        title="Total Unpaid This Month"
+        title="Total Unpaid"
         total={formatter.format(calculateTotalUnpaidForThisMonth())}
         icon={"fa fa-usd fa-5x"}
         caution

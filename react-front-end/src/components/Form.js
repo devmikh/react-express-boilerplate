@@ -455,7 +455,7 @@ export default function Form(props) {
               <label>Monthly</label>
             </div>
             <div>
-              <label>{paymentMonthly ? "Start Date" : "Date"}</label>
+              <label>{paymentMonthly ? "First Due Date:" : "Date:"}</label>
               <br />
               <br />
               <input
