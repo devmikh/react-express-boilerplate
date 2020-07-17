@@ -93,7 +93,7 @@ let paymentNotificationLog = {};
 setInterval(async () => {
   handleWarrantyNotifications();
   handlePaymentNotifications();
-}, 10000);
+}, 1000);
 
 // handlePaymentNotifications();
 
